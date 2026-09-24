@@ -4,12 +4,14 @@ const WIDGET_SCRIPT_ID = "anythingllm-chat-widget-script";
 
 export default function AnythingLLMChat() {
   useEffect(() => {
-    const baseUrl = import.meta.env.VITE_ANYTHINGLLM_BASE_URL?.replace(/\/$/, "");
+    const baseUrl = (
+      import.meta.env.VITE_ANYTHINGLLM_BASE_URL || import.meta.env.VITE_API_URL
+    )?.replace(/\/$/, "");
     const embedId = import.meta.env.VITE_ANYTHINGLLM_EMBED_ID;
 
     if (!baseUrl || !embedId) {
       console.warn(
-        "El chat de AnythingLLM no se cargó: faltan VITE_ANYTHINGLLM_BASE_URL o VITE_ANYTHINGLLM_EMBED_ID.",
+        "El chat de AnythingLLM no se cargó: faltan VITE_ANYTHINGLLM_BASE_URL (o VITE_API_URL) o VITE_ANYTHINGLLM_EMBED_ID.",
       );
       return undefined;
     }
