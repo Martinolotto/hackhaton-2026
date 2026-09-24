@@ -1,5 +1,4 @@
 import { useState } from "react";
-import AnythingLLMChat from "@/chatbot/anythingllm";
 import { handleLogout } from "@/components/services/handleLogout";
 
 function DashboardInterface({ onLogout }) {
@@ -43,8 +42,6 @@ function DashboardInterface({ onLogout }) {
             </p>
           )}
         </div>
-
-        <AnythingLLMChat />
       </section>
     </main>
   );

@@ -142,35 +142,7 @@ Si algo puede resolverse de forma simple y segura con Supabase sin agregar backe
 
 ---
 
-## 8. Chatbot / Inteligencia Artificial
-
-Queremos llevar preparada una funcionalidad de chatbot.
-
-La solución elegida actualmente es:
-
-### AnythingLLM
-
-AnythingLLM ya está prácticamente configurado e integrado con nuestro frontend.
-
-La intención es poder reutilizarlo durante la hackathon para construir rápidamente funcionalidades como:
-
-- asistente dentro de la plataforma;
-- preguntas sobre documentación;
-- orientación al usuario;
-- consulta de información;
-- chatbot especializado según la problemática;
-- RAG sobre documentos;
-- ayuda contextual.
-
-Durante la hackathon, el comportamiento del chatbot deberá adaptarse a la problemática específica.
-
-No debemos agregar IA simplemente porque sí.
-
-La IA debe aportar una función clara dentro de la solución.
-
----
-
-## 9. Estado actual
+## 8. Estado actual
 
 Actualmente ya estamos trabajando en el módulo base que llevaremos a la hackathon.
 
@@ -183,14 +155,12 @@ Tenemos adelantadas o en preparación las siguientes áreas:
 - base de datos;
 - autenticación y lógica relacionada;
 - backend;
-- integración de AnythingLLM;
-- chatbot integrado en el frontend.
 
 Algunas de estas partes pueden estar incompletas o sujetas a cambios.
 
 ---
 
-## 10. Nuestra principal duda actual
+## 9. Nuestra principal duda actual
 
 No somos expertos todavía en desarrollo de software ni en hackathons.
 
@@ -348,7 +318,6 @@ Cuando respondas preguntas relacionadas con nuestra hackathon:
 Frontend: React + Vite
 Base de datos / servicios: Supabase
 Backend: capa propia cuando sea necesaria
-Chatbot / IA: AnythingLLM
 ```
 
 El objetivo final es conseguir una base suficientemente flexible como para adaptarla rápidamente a cualquiera de las problemáticas posibles de la hackathon.
