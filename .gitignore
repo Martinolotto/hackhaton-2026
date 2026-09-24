@@ -1,0 +1,22 @@
+# Dependencies
+**/node_modules/
+
+# Build output
+**/dist/
+
+# Environment files
+**/.env
+**/.env.*
+!**/.env.example
+
+# Generated analysis output
+frontend/graphify-out/
+
+# Logs and temporary caches
+*.log
+logs/
+*.cache
+.cache/
+.vite/
+coverage/
+.DS_Store
