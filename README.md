@@ -39,3 +39,4 @@ npm run build
 
 Configurar en Vercel las variables de entorno `VITE_*` requeridas por el frontend.
 Configuracion de vercel
+Configuracion para vercel tercer intento
