@@ -8,7 +8,6 @@ import Foro from "./pages/Foro/foro";
 import HomePrueba from "./pages/home/homePrueba";
 import ProtectedRoute from "./routes/protectedRoute";
 import PublicOnlyRoute from "./routes/publicOnlyRoute";
-import { PageCurtainStage } from "./components/motion-ui/page-curtain";
 
 export default function App() {
   return (

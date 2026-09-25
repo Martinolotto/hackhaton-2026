@@ -43,14 +43,14 @@ function hasExactKeys(value, expectedKeys) {
   return keys.length === expectedKeys.length && expectedKeys.every((key) => keys.includes(key));
 }
 
-function isNonEmptyString(value) {
-  return typeof value === "string" && value.length > 0;
+function isBoundedString(value, maxLength) {
+  return typeof value === "string" && value.length >= 1 && value.length <= maxLength;
 }
 
 function isStatement(value) {
   return (
     hasExactKeys(value, ["statement", "basis"]) &&
-    isNonEmptyString(value.statement) &&
+    isBoundedString(value.statement, 1000) &&
     ["user_provided", "inferred"].includes(value.basis)
   );
 }
@@ -58,7 +58,7 @@ function isStatement(value) {
 function isEvidence(value) {
   return (
     hasExactKeys(value, ["statement", "origin", "effect", "verificationStatus"]) &&
-    isNonEmptyString(value.statement) &&
+    isBoundedString(value.statement, 1000) &&
     ["user_input", "reported_verification_result"].includes(value.origin) &&
     ["supports_legitimacy", "raises_concern", "neutral"].includes(value.effect) &&
     ["not_independently_verified", "user_reported"].includes(value.verificationStatus)
@@ -69,7 +69,7 @@ function isLevelWithExplanation(value, levels) {
   return (
     hasExactKeys(value, ["level", "explanation"]) &&
     levels.includes(value.level) &&
-    isNonEmptyString(value.explanation)
+    isBoundedString(value.explanation, 2000)
   );
 }
 
@@ -79,25 +79,29 @@ function isVerificationStep(value) {
     Number.isInteger(value.priority) &&
     value.priority >= 1 &&
     value.priority <= 5 &&
-    isNonEmptyString(value.action) &&
-    isNonEmptyString(value.reason)
+    isBoundedString(value.action, 1000) &&
+    isBoundedString(value.reason, 1000)
   );
 }
 
-function isStringList(value, { min = 0, max }) {
+function isStringList(value, { min = 0, max, maxLength = 1000 }) {
   return (
     Array.isArray(value) &&
     value.length >= min &&
     value.length <= max &&
-    value.every(isNonEmptyString)
+    value.every((item) => isBoundedString(item, maxLength))
   );
+}
+
+function hasUniquePriorities(steps) {
+  return new Set(steps.map((step) => step.priority)).size === steps.length;
 }
 
 export function isEvaluationResponse(value) {
   return (
     hasExactKeys(value, RESPONSE_KEYS) &&
     ["initial", "reevaluated"].includes(value.phase) &&
-    isNonEmptyString(value.summary) &&
+    isBoundedString(value.summary, 2000) &&
     Array.isArray(value.indicators) &&
     value.indicators.length <= 12 &&
     value.indicators.every(isStatement) &&
@@ -115,8 +119,9 @@ export function isEvaluationResponse(value) {
     value.verificationSteps.length >= 1 &&
     value.verificationSteps.length <= 5 &&
     value.verificationSteps.every(isVerificationStep) &&
+    hasUniquePriorities(value.verificationSteps) &&
     isStringList(value.cautionGuidance, { min: 1, max: 8 }) &&
-    isNonEmptyString(value.learning) &&
+    isBoundedString(value.learning, 1500) &&
     isStringList(value.limitations, { min: 1, max: 8 })
   );
 }

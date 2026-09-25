@@ -50,10 +50,7 @@ function buildComparison(initialEvaluation, reevaluation) {
     (areEqual(initialEvaluation[key], reevaluation[key]) ? remained : changed).push(label);
   });
 
-  const initialMissing = new Set(initialEvaluation.missingInformation);
-  const persistentMissing = reevaluation.missingInformation.filter((item) => initialMissing.has(item));
-
-  return { changed, remained, persistentMissing };
+  return { changed, remained };
 }
 
 function InteractionRecap({ interaction }) {
@@ -102,12 +99,12 @@ function EvaluationComparison({ initialEvaluation, reevaluation }) {
         </section>
         <section>
           <h3>Información faltante que continúa</h3>
-          {comparison.persistentMissing.length ? (
+          {reevaluation.missingInformation.length ? (
             <ul>
-              {comparison.persistentMissing.map((item) => <li key={item}>{item}</li>)}
+              {reevaluation.missingInformation.map((item) => <li key={item}>{item}</li>)}
             </ul>
           ) : (
-            <p>No se repiten faltantes textuales de la evaluación inicial. Revisa igualmente los faltantes actuales del resultado.</p>
+            <p>La reevaluación no informa datos faltantes adicionales.</p>
           )}
         </section>
       </div>
