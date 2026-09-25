@@ -1,0 +1,12 @@
+.tech-text {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.tech-text-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
