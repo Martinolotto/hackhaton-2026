@@ -32,9 +32,22 @@ avanzar a planificación.
 - [x] La feature satisface los resultados medibles definidos
 - [x] La specification no filtra detalles de implementación
 
+## Validación del ajuste editorial
+
+- [x] La procedencia de afirmaciones factuales, ejemplos documentales y contenido
+  externo debe poder identificarse mediante fuentes documentadas
+- [x] El contenido temporal o geográficamente situado exige fuente, ámbito,
+  fecha o período y carácter ilustrativo y no exhaustivo
+- [x] El contenido sensible al tiempo permanece estático y no introduce feed,
+  monitoreo, alertas operativas ni cobertura total prometida
+- [x] Las historias de usuario y el objetivo preventivo principal no cambiaron
+- [x] El ajuste no incorpora detalles técnicos ni amplía el alcance funcional
+
 ## Notas
 
 - Los ítems incompletos requieren actualizar la specification antes de
   `$speckit-clarify` o `$speckit-plan`.
 - Validación 1 completada el 2026-09-25: todos los ítems cumplen. No se detectaron
   ambigüedades bloqueantes ni se requirieron aclaraciones.
+- Validación 2 completada el 2026-09-25 después del ajuste editorial: todos los
+  ítems generales y específicos cumplen; no quedan aclaraciones pendientes.

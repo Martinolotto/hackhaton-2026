@@ -190,6 +190,16 @@ acceso y comportamiento existentes.
   datos personales, preferencias ni historial de lectura.
 - **RF-025**: El contenido DEBE ser curado y común para todas las personas; NO
   DEBE generarse ni personalizarse dinámicamente.
+- **RF-026**: Toda afirmación factual, ejemplo documental o contenido editorial
+  tomado de fuentes externas DEBE mantener una procedencia identificable mediante
+  fuentes documentadas, sin exigir un formato particular para presentarlas.
+- **RF-027**: Si la guía presenta modalidades o patrones como recientes, actuales,
+  observados en Argentina u observados durante un período concreto, DEBE indicar
+  su ámbito geográfico, fecha o período de referencia, fuente y carácter
+  ilustrativo y no exhaustivo. Ese contenido DEBE ser una referencia editorial
+  estática: NO DEBE constituir un feed, monitoreo ni alerta operativa, NO DEBE
+  prometer representar todas las amenazas vigentes y solo DEBE actualizarse
+  mediante modificaciones editoriales versionadas.
 
 ### Alcance explícito
 
@@ -271,6 +281,10 @@ acceso y comportamiento existentes.
   su contenido preventivo.
 - **CE-009**: Una revisión funcional confirma que consultar la guía no crea ni
   modifica datos personales, preferencias, historial o casos.
+- **CE-010**: En el 100 % del contenido presentado como temporal, reciente o
+  geográficamente situado, una revisión identifica la fuente, el ámbito
+  geográfico, la fecha o período de referencia y una aclaración de su carácter
+  ilustrativo y no exhaustivo.
 
 ## Supuestos
 
@@ -280,8 +294,13 @@ acceso y comportamiento existentes.
 - Las siete áreas mínimas pueden presentarse como categorías separadas o como
   agrupaciones equivalentes, siempre que cada tema sea claramente localizable y
   conserve sus acciones y límites.
-- La guía utiliza contenido curado a partir de Paso 0; esta specification define
-  su cobertura y reglas, no redacta el texto editorial definitivo.
+- Paso 0 gobierna el propósito, alcance, categorías, límites y principios del
+  producto, pero no es necesariamente la fuente factual de todo el contenido
+  editorial ni redacta su texto definitivo.
+- Las afirmaciones factuales, ejemplos y referencias editoriales pueden provenir
+  de fuentes externas documentadas y confiables, siempre que su origen permanezca
+  identificable; esta specification no fija todavía un formato particular para
+  presentar esas fuentes.
 - El recorrido de evaluación de la feature 001 existe, está integrado y conserva
   sus requisitos de autenticación y contrato sin cambios.
 - Una persona sin sesión puede consultar la guía y, si decide evaluar un caso,
