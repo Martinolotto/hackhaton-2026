@@ -45,11 +45,6 @@ function LoginInterface({ onAuthenticated }) {
     }
   }
 
-  const handleForgotPassword = () => {
-    console.log('Forgot password requested')
-    setMessage('Recuperación de contraseña lista para conectar.')
-  }
-
   return (
     <div className="auth-page">
       <Nav />
@@ -105,10 +100,10 @@ function LoginInterface({ onAuthenticated }) {
             </span>
           </label>
 
-          <div className="flex flex-col gap-4 border border-black p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border border-black p-3">
             <label className="flex items-center gap-2 text-sm" htmlFor="remember-me">
               <input
-                className="size-5 border border-black accent-black"
+                className="size-5 border border-black"
                 id="remember-me"
                 name="rememberMe"
                 type="checkbox"
@@ -117,13 +112,6 @@ function LoginInterface({ onAuthenticated }) {
               />
               Recordarme
             </label>
-            <button
-              className="border border-black px-3 py-2 text-sm font-medium"
-              type="button"
-              onClick={handleForgotPassword}
-            >
-              Olvidé mi contraseña
-            </button>
           </div>
 
           <button
@@ -138,7 +126,7 @@ function LoginInterface({ onAuthenticated }) {
             className="min-h-12 border border-black px-4 font-semibold"
             to="/register"
           >
-            Crear una cuenta
+            CREAR UNA CUENTA
           </Link>
 
           {message && (

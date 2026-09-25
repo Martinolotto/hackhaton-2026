@@ -2,16 +2,19 @@ import {
   ArrowUpRight,
   Check,
   FileSearch,
+  LockKeyhole,
   MessageSquareText,
   Pause,
   Search,
+  Shield,
   ShieldCheck,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import Nav from "../../components/navegation/nav";
-import HeroImageCarousel from "../../components/home/HeroImageCarousel";
 import { useAuth } from "../../context/auth";
+import heroSecurityImage from "../../assets/fondo.avif";
+import Background from "../../components/Background";
 import "./homePrueba.css";
 
 import SplitText from "@/components/react-bits/textAparicionAnimations/SplitText";
@@ -67,12 +70,22 @@ export default function HomePrueba() {
         Ir al contenido principal
       </a>
 
+      <Background />
       <Nav />
 
       <main id="contenido-home-prueba" tabIndex="-1">
         <section className="hp-tech-text-hero" aria-label="Mensaje principal">
           <div className="hp-tech-text-frame">
-            <HeroImageCarousel />
+            <div className="hp-image-carousel">
+              <img
+                className="hp-carousel-image"
+                src={heroSecurityImage}
+                alt="Escudo digital con candado sobre un circuito tecnológico."
+                width="1672"
+                height="941"
+                fetchPriority="high"
+              />
+            </div>
             <div className="hp-hero-content">
               <div className="hp-hero-copy">
                 <div className="hp-hero-badge">
@@ -113,34 +126,11 @@ export default function HomePrueba() {
         </section>
 
         <section className="hp-statement" aria-labelledby="hp-statement-title">
-          <SplitText
-            tag="h2"
-            id="hp-statement-title"
-            text="La apariencia inspira confianza. La evidencia ayuda a sostenerla."
-            splitBy="chars"
-            easing="elastic.out"
-            delay={10}
-            duration={1.3}
-            threshold={0.2}
-            rootMargin="-50px"
-          />
-          <p>
-            Un nombre conocido, un sitio cuidado o un mensaje bien escrito no
-            confirman por sí solos quién está detrás. A tiempo hace visible lo
-            que observas, lo que falta y lo que todavía conviene comprobar.
-          </p>
-        </section>
-
-        <section
-          className="hp-situations"
-          id="situaciones"
-          aria-labelledby="hp-situations-title"
-        >
-          <div className="hp-section-heading">
+          <div className="hp-statement-panel">
             <SplitText
               tag="h2"
-              id="hp-situations-title"
-              text="Hay momentos cotidianos que merecen una segunda mirada."
+              id="hp-statement-title"
+              text="La apariencia inspira confianza. La evidencia ayuda a sostenerla."
               splitBy="chars"
               easing="elastic.out"
               delay={10}
@@ -149,33 +139,51 @@ export default function HomePrueba() {
               rootMargin="-50px"
             />
             <p>
-              No se trata de desconfiar de todo, sino de reconocer cuándo una
-              pausa puede darte mejor información.
+              Un nombre conocido, un sitio cuidado o un mensaje bien escrito no
+              confirman por sí solos quién está detrás. A tiempo hace visible lo
+              que observas, lo que falta y lo que todavía conviene comprobar.
             </p>
           </div>
+        </section>
 
-          <div className="hp-situation-list">
-            {situations.map(({ context, title, copy, icon: Icon }) => (
-              <article className="hp-situation" key={context}>
-                <span className="hp-situation-icon" aria-hidden="true">
-                  <Icon size={22} strokeWidth={1.7} />
-                </span>
-                <div className="hp-situation-copy">
-                  <SplitText
-                    tag="h3"
-                    text={title}
-                    splitBy="chars"
-                    easing="elastic.out"
-                    delay={10}
-                    duration={1.3}
-                    threshold={0.2}
-                    rootMargin="-50px"
-                  />
-                  <p>{copy}</p>
-                  <span>{context}</span>
-                </div>
-              </article>
-            ))}
+        <section
+          className="hp-situations"
+          id="situaciones"
+          aria-labelledby="hp-situations-title"
+        >
+          <div className="hp-section-inner">
+            <div className="hp-section-heading">
+              <SplitText
+                tag="h2"
+                id="hp-situations-title"
+                text="Hay momentos cotidianos que merecen una segunda mirada."
+                splitBy="chars"
+                easing="elastic.out"
+                delay={10}
+                duration={1.3}
+                threshold={0.2}
+                rootMargin="-50px"
+              />
+              <p>
+                No se trata de desconfiar de todo, sino de reconocer cuándo una
+                pausa puede darte mejor información.
+              </p>
+            </div>
+
+            <div className="hp-situation-list">
+              {situations.map(({ context, title, copy, icon: Icon }) => (
+                <article className="hp-situation" key={context}>
+                  <span className="hp-situation-icon" aria-hidden="true">
+                    <Icon size={22} strokeWidth={1.7} />
+                  </span>
+                  <div className="hp-situation-copy">
+                    <span>{context}</span>
+                    <h3>{title}</h3>
+                    <p>{copy}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -184,47 +192,40 @@ export default function HomePrueba() {
           id="como-funciona"
           aria-labelledby="hp-method-title"
         >
-          <div className="hp-method-heading">
-            <SplitText
-              tag="h2"
-              id="hp-method-title"
-              text="Una pausa breve puede convertir señales sueltas en próximos pasos."
-              splitBy="chars"
-              easing="elastic.out"
-              delay={10}
-              duration={1.3}
-              threshold={0.2}
-              rootMargin="-50px"
-            />
-            <p>
-              El método mantiene la decisión en tus manos y agrega estructura
-              cuando la presión intenta quitártela.
-            </p>
-          </div>
+          <div className="hp-section-inner">
+            <div className="hp-method-heading">
+              <SplitText
+                tag="h2"
+                id="hp-method-title"
+                text="Una pausa breve puede convertir señales sueltas en próximos pasos."
+                splitBy="chars"
+                easing="elastic.out"
+                delay={10}
+                duration={1.3}
+                threshold={0.2}
+                rootMargin="-50px"
+              />
+              <p>
+                El método mantiene la decisión en tus manos y agrega estructura
+                cuando la presión intenta quitártela.
+              </p>
+            </div>
 
-          <ol className="hp-method-steps">
-            {method.map(({ title, copy, icon: Icon }, index) => (
-              <li key={title}>
-                <span className="hp-method-icon" aria-hidden="true">
-                  <Icon size={21} strokeWidth={1.7} />
-                </span>
-                <span className="hp-method-index" aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <SplitText
-                  tag="h3"
-                  text={title}
-                  splitBy="chars"
-                  easing="elastic.out"
-                  delay={10}
-                  duration={1.3}
-                  threshold={0.2}
-                  rootMargin="-50px"
-                />
-                <p>{copy}</p>
-              </li>
-            ))}
-          </ol>
+            <ol className="hp-method-steps">
+              {method.map(({ title, copy, icon: Icon }, index) => (
+                <li key={title}>
+                  <span className="hp-method-icon" aria-hidden="true">
+                    <Icon size={21} strokeWidth={1.7} />
+                  </span>
+                  <span className="hp-method-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
         <section className="hp-closing" aria-labelledby="hp-closing-title">
@@ -260,9 +261,8 @@ export default function HomePrueba() {
         <div>
           <Link className="hp-wordmark" to="/home-prueba">
             <span className="hp-wordmark-mark" aria-hidden="true">
-              <span />
-              <span />
-              <span />
+              <Shield className="hp-wordmark-shield" />
+              <LockKeyhole className="hp-wordmark-lock" />
             </span>
             A tiempo
           </Link>

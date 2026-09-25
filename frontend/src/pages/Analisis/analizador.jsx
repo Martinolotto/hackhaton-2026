@@ -5,7 +5,7 @@ import "../app-sections.css";
 
 export default function Analizador() {
   return (
-    <div className="at-page">
+    <div className="at-page analysis-page">
       <Nav />
       <main className="at-main" id="contenido-principal" tabIndex="-1">
         <header className="at-intro">
