@@ -9,7 +9,7 @@ import { buildEvaluationContent, buildEvaluationResponse, evaluationCases } from
 
 process.env.GEMINI_MODEL ??= "test-model";
 process.env.GEMINI_FALLBACK_MODEL ??= "test-fallback-model";
-process.env.NVIDIA_MODEL ??= "test-nvidia-model";
+process.env.OLLAMA_MODEL ??= "test-ollama-model";
 
 const silentLogger = { info() {} };
 const imageFixtures = {
@@ -59,7 +59,7 @@ test("la evaluación sin imagen conserva el input textual existente", async () =
   let capturedInput;
   const evaluate = createEvaluationService({
     logger: silentLogger,
-    evaluateNvidia: async ({ textInput }) => {
+    evaluateOllama: async ({ textInput }) => {
       capturedInput = textInput;
       return JSON.stringify(buildEvaluationContent());
     },
@@ -159,7 +159,6 @@ test("el fallback entrega texto e imagen a Gemini y valida el mismo structured o
   let capturedRequest;
   const evaluate = createEvaluationService({
     logger: silentLogger,
-    evaluateNvidia: async () => Promise.reject(Object.assign(new Error("unavailable"), { status: 503 })),
     evaluateGemini: createGeminiProvider({ createInteraction: async (request) => {
       capturedRequest = request;
       return { output_text: JSON.stringify(buildEvaluationContent()) };
