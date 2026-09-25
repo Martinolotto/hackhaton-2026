@@ -1,6 +1,7 @@
 import Nav from "../../components/navegation/nav";
 import { ArrowUpRight, Check, Search, ShieldCheck } from "lucide-react";
 import { Link } from "react-router";
+import SplitText from "../../components/react-bits/textAparicionAnimations/SplitText";
 import "./home.css";
 
 export default function Home() {
@@ -31,7 +32,7 @@ export default function Home() {
       <main id="contenido-principal">
         <section className="landing-hero" aria-labelledby="home-title">
           <div className="landing-hero-copy">
-            <h1 id="home-title">Si algo te apura, no decidas todavía.</h1>
+            <SplitText tag="h1" id="home-title" text="Si algo te apura, no decidas todavía." />
             <p>
               A tiempo te ayuda a mirar con más calma los mensajes, enlaces,
               ofertas y perfiles que aparecen todos los días.
@@ -64,7 +65,7 @@ export default function Home() {
         </section>
 
         <section className="landing-statement" aria-labelledby="statement-title">
-          <h2 id="statement-title">La apariencia no siempre alcanza.</h2>
+          <SplitText tag="h2" id="statement-title" text="La apariencia no siempre alcanza." />
           <p>
             Los engaños pueden usar nombres conocidos, urgencia o detalles
             convincentes. Reconocer una duda a tiempo permite elegir qué hacer
@@ -73,13 +74,13 @@ export default function Home() {
         </section>
 
         <section className="situation-list" id="evaluar" aria-labelledby="situations-title">
-          <h2 id="situations-title" className="sr-only">Situaciones cotidianas</h2>
+          <SplitText tag="h2" id="situations-title" className="sr-only" text="Situaciones cotidianas" />
           {situations.map((situation) => (
             <article className="situation-row" key={situation.eyebrow}>
               <div className="situation-marker" aria-hidden="true"><span /></div>
               <div>
                 <p className="situation-eyebrow">{situation.eyebrow}</p>
-                <h3>{situation.title}</h3>
+                <SplitText tag="h3" text={situation.title} />
               </div>
               <p className="situation-copy">{situation.copy}</p>
             </article>
@@ -88,7 +89,7 @@ export default function Home() {
 
         <section className="landing-method" id="aprender" aria-labelledby="method-title">
           <div className="landing-method-title">
-            <h2 id="method-title">Antes de actuar, verificá.</h2>
+            <SplitText tag="h2" id="method-title" text="Antes de actuar, verificá." />
             <p>
               No se trata de desconfiar de todo. Se trata de contar con un
               momento y criterios para decidir mejor.
@@ -97,21 +98,21 @@ export default function Home() {
           <ol>
             <li>
               <span className="method-icon"><ShieldCheck aria-hidden="true" size={22} /></span>
-              <div><h3>Detenete</h3><p>La urgencia no tiene que decidir por vos.</p></div>
+              <div><SplitText tag="h3" text="Detenete" /><p>La urgencia no tiene que decidir por vos.</p></div>
             </li>
             <li>
               <span className="method-icon"><Search aria-hidden="true" size={22} /></span>
-              <div><h3>Observá el contexto</h3><p>Revisá quién escribe, qué pide y a dónde lleva.</p></div>
+              <div><SplitText tag="h3" text="Observá el contexto" /><p>Revisá quién escribe, qué pide y a dónde lleva.</p></div>
             </li>
             <li>
               <span className="method-icon"><Check aria-hidden="true" size={22} /></span>
-              <div><h3>Contrastá</h3><p>Buscá una fuente o canal conocido e independiente.</p></div>
+              <div><SplitText tag="h3" text="Contrastá" /><p>Buscá una fuente o canal conocido e independiente.</p></div>
             </li>
           </ol>
         </section>
 
         <section className="landing-closing" aria-labelledby="closing-title">
-          <h2 id="closing-title">Una pausa también puede protegerte.</h2>
+          <SplitText tag="h2" id="closing-title" text="Una pausa también puede protegerte." />
           <Link className="landing-primary-action" to="/register">
             Empezar ahora <ArrowUpRight aria-hidden="true" size={18} />
           </Link>

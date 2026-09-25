@@ -9,9 +9,10 @@ import {
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import Nav from "../../components/navegation/nav";
-import MaskedHeading from "../../components/react-bits/MaskedHeading";
-import heroImage from "../../assets/hero.png";
 import "./homePrueba.css";
+
+import TechText from "@/components/react-bits/techText";
+import SplitText from "@/components/react-bits/textAparicionAnimations/SplitText";
 
 const MotionLink = motion.create(Link);
 
@@ -66,30 +67,31 @@ export default function HomePrueba() {
       <Nav />
 
       <main id="contenido-home-prueba" tabIndex="-1">
-        <MaskedHeading
-          text="Si algo te apura, no decidas todavía."
-          src={heroImage}
-          fillScale={1.25}
-          parallax={26}
-          reveal="rise"
-          trigger="view"
-          drift={18}
-          brightness={1}
-          saturation={1}
-          grayscale={false}
-          duration={1.1}
-          stagger={0.09}
-          align="center"
-          weight={700}
-          tracking={-0.03}
-          lineHeight={1.06}
-          textScale={0.115}
-        />
+        <section className="hp-tech-text-hero" aria-label="Mensaje principal">
+          <div className="hp-tech-text-frame">
+            <TechText
+              text="Si algo te apura, no decidas todavía."
+              color="#000000"
+              accentColor="#000000"
+              fontWeight={700}
+              fontSize={120}
+              className="hp-tech-text"
+            />
+          </div>
+        </section>
 
         <section className="hp-statement" aria-labelledby="hp-statement-title">
-          <h2 id="hp-statement-title">
-            La apariencia inspira confianza. La evidencia ayuda a sostenerla.
-          </h2>
+          <SplitText
+            tag="h2"
+            id="hp-statement-title"
+            text="La apariencia inspira confianza. La evidencia ayuda a sostenerla."
+            splitBy="chars"
+            easing="elastic.out"
+            delay={10}
+            duration={1.3}
+            threshold={0.2}
+            rootMargin="-50px"
+          />
           <p>
             Un nombre conocido, un sitio cuidado o un mensaje bien escrito no
             confirman por sí solos quién está detrás. A tiempo hace visible lo
@@ -103,9 +105,17 @@ export default function HomePrueba() {
           aria-labelledby="hp-situations-title"
         >
           <div className="hp-section-heading">
-            <h2 id="hp-situations-title">
-              Hay momentos cotidianos que merecen una segunda mirada.
-            </h2>
+            <SplitText
+              tag="h2"
+              id="hp-situations-title"
+              text="Hay momentos cotidianos que merecen una segunda mirada."
+              splitBy="chars"
+              easing="elastic.out"
+              delay={10}
+              duration={1.3}
+              threshold={0.2}
+              rootMargin="-50px"
+            />
             <p>
               No se trata de desconfiar de todo, sino de reconocer cuándo una
               pausa puede darte mejor información.
@@ -119,7 +129,16 @@ export default function HomePrueba() {
                   <Icon size={22} strokeWidth={1.7} />
                 </span>
                 <div className="hp-situation-copy">
-                  <h3>{title}</h3>
+                  <SplitText
+                    tag="h3"
+                    text={title}
+                    splitBy="chars"
+                    easing="elastic.out"
+                    delay={10}
+                    duration={1.3}
+                    threshold={0.2}
+                    rootMargin="-50px"
+                  />
                   <p>{copy}</p>
                   <span>{context}</span>
                 </div>
@@ -134,10 +153,17 @@ export default function HomePrueba() {
           aria-labelledby="hp-method-title"
         >
           <div className="hp-method-heading">
-            <h2 id="hp-method-title">
-              Una pausa breve puede convertir señales sueltas en próximos
-              pasos.
-            </h2>
+            <SplitText
+              tag="h2"
+              id="hp-method-title"
+              text="Una pausa breve puede convertir señales sueltas en próximos pasos."
+              splitBy="chars"
+              easing="elastic.out"
+              delay={10}
+              duration={1.3}
+              threshold={0.2}
+              rootMargin="-50px"
+            />
             <p>
               El método mantiene la decisión en tus manos y agrega estructura
               cuando la presión intenta quitártela.
@@ -153,7 +179,16 @@ export default function HomePrueba() {
                 <span className="hp-method-index" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <h3>{title}</h3>
+                <SplitText
+                  tag="h3"
+                  text={title}
+                  splitBy="chars"
+                  easing="elastic.out"
+                  delay={10}
+                  duration={1.3}
+                  threshold={0.2}
+                  rootMargin="-50px"
+                />
                 <p>{copy}</p>
               </li>
             ))}
@@ -162,7 +197,17 @@ export default function HomePrueba() {
 
         <section className="hp-closing" aria-labelledby="hp-closing-title">
           <div>
-            <h2 id="hp-closing-title">Decide con más contexto.</h2>
+            <SplitText
+              tag="h2"
+              id="hp-closing-title"
+              text="Decide con más contexto."
+              splitBy="chars"
+              easing="elastic.out"
+              delay={10}
+              duration={1.3}
+              threshold={0.2}
+              rootMargin="-50px"
+            />
             <p>
               Reúne lo que observas, identifica lo que falta y verifica antes
               de realizar una acción difícil de revertir.
