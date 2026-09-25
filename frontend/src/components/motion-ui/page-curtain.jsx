@@ -6,6 +6,7 @@ import "./page-curtain.css";
 const pageTitles = {
   "/": "Inicio",
   "/home-prueba": "Inicio",
+  "/evaluar": "Evaluar interacción",
   "/analizar-datos": "Analizar datos",
   "/aprendizaje": "Aprendizaje",
   "/foro": "Foro",

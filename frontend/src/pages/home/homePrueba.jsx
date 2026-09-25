@@ -9,6 +9,7 @@ import {
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import Nav from "../../components/navegation/nav";
+import { useAuth } from "../../context/auth";
 import "./homePrueba.css";
 
 import TechText from "@/components/react-bits/techText";
@@ -57,6 +58,7 @@ const method = [
 
 export default function HomePrueba() {
   const shouldReduceMotion = useReducedMotion();
+  const { user } = useAuth();
 
   return (
     <div className="home-prueba">
@@ -215,10 +217,10 @@ export default function HomePrueba() {
           </div>
           <MotionLink
             className="hp-primary"
-            to="/register"
+            to={user ? "/evaluar" : "/register"}
             whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
           >
-            Empezar con A tiempo
+            {user ? "Evaluar una interacción" : "Empezar con A tiempo"}
             <ArrowUpRight aria-hidden="true" size={18} />
           </MotionLink>
         </section>

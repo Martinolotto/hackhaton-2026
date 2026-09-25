@@ -61,7 +61,7 @@ export default function Nav() {
 
         <div className="hp-desktop-nav">
           <Link to="/aprendizaje">Aprendizaje</Link>
-          <Link to="/analizar-datos">Analizar datos</Link>
+          <Link to="/evaluar">Evaluar interacción</Link>
           <Link to={forumDestination} onClick={handleForumClick}>Foro</Link>
           {user ? (
             <button
@@ -112,8 +112,8 @@ export default function Nav() {
         <Link to="/aprendizaje" onClick={closeMenu}>
           Aprendizaje
         </Link>
-        <Link to="/analizar-datos" onClick={closeMenu}>
-          Analizar datos
+        <Link to="/evaluar" onClick={closeMenu}>
+          Evaluar interacción
         </Link>
         <Link
           to={forumDestination}

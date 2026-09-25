@@ -21,7 +21,7 @@ export default function Foro() {
             <p>Busca dominios, cuentas o patrones. Los reportes aportan evidencia colectiva, pero no reemplazan una verificación independiente.</p>
           </div>
           <div className="forum-intro-actions">
-            <Link className="at-button" to="/analizar-datos">Analizar interacción <ArrowRight size={18} aria-hidden="true" /></Link>
+            <Link className="at-button" to="/evaluar">Evaluar interacción <ArrowRight size={18} aria-hidden="true" /></Link>
             <aside className="forum-profile" aria-label="Perfil de comunidad">
               <span className="forum-profile-icon" aria-hidden="true"><UserRound size={24} /></span>
               <div>
