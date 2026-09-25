@@ -1,0 +1,30 @@
+.page-curtain-content {
+  min-height: 100dvh;
+}
+
+.page-curtain {
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  position: fixed;
+  transform: translateZ(0);
+  z-index: 200;
+}
+
+.page-curtain-surface {
+  background: #07111f;
+  inset: -60%;
+  position: absolute;
+  transform: rotate(60deg);
+  transform-origin: center;
+}
+
+.page-curtain-announcer {
+  block-size: 1px;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  inline-size: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+}

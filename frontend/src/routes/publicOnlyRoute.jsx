@@ -4,7 +4,7 @@ import { useAuth } from "../context/auth";
 export default function PublicOnlyRoute() {
   const { session, loading } = useAuth();
   const location = useLocation();
-  const destination = location.state?.from?.pathname ?? "/dashboard";
+  const destination = location.state?.from?.pathname ?? "/evaluar";
 
   if (loading) {
     return <p>Cargando sesión...</p>;

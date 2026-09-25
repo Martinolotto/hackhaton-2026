@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { handleLogin } from '@/components/services/handleLogin'
 import Nav from '../../../components/navegation/nav'
+import SplitText from '../../../components/react-bits/textAparicionAnimations/SplitText'
+import '../auth.css'
 
 const initialCredentials = {
   email: '',
@@ -49,7 +51,7 @@ function LoginInterface({ onAuthenticated }) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="auth-page">
       <Nav />
       <main className="flex min-h-[calc(100vh-57px)] items-center justify-center p-4 sm:p-8">
       <section
@@ -60,9 +62,12 @@ function LoginInterface({ onAuthenticated }) {
           <div className="flex size-28 items-center justify-center border border-black" aria-hidden="true">
             <UserRound size={56} strokeWidth={1.5} />
           </div>
-          <h1 id="login-title" className="mt-6 text-3xl font-semibold">
-            Iniciar sesión
-          </h1>
+          <SplitText
+            tag="h1"
+            id="login-title"
+            text="Iniciar sesión"
+            className="mt-6 text-3xl font-semibold"
+          />
         </header>
 
         <form className="mt-8 grid gap-5 border border-black p-5" onSubmit={handleSubmit}>

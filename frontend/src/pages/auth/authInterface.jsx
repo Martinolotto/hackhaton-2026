@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { handleRegister } from '@/components/services/registerHandler'
 import Nav from '../../components/navegation/nav'
+import SplitText from '../../components/react-bits/textAparicionAnimations/SplitText'
+import './auth.css'
 
 const initialForm = {
   firstName: '',
@@ -74,7 +76,7 @@ function AuthInterface({ onRegistered }) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="auth-page">
       <Nav />
       <main className="min-h-[calc(100vh-57px)] p-4 sm:p-8 lg:flex lg:items-center lg:justify-center lg:p-12">
       <section
@@ -100,11 +102,11 @@ function AuthInterface({ onRegistered }) {
           </div>
 
           <div className="mt-8 text-center">
-            <h1 className="text-2xl font-semibold sm:text-3xl">
-              Capturando momentos,
-              <br />
-              creando recuerdos
-            </h1>
+            <SplitText
+              tag="h1"
+              text="Capturando momentos, creando recuerdos"
+              className="text-2xl font-semibold sm:text-3xl"
+            />
             <div className="mt-6 flex justify-center gap-2" aria-label="Indicador de diapositivas">
               <span className="h-1 w-7 border border-black" />
               <span className="h-1 w-7 border border-black" />
@@ -115,7 +117,11 @@ function AuthInterface({ onRegistered }) {
 
         <section className="flex min-h-150 flex-col p-5 sm:p-8 md:p-12">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Crear una cuenta</h2>
+            <SplitText
+              tag="h2"
+              text="Crear una cuenta"
+              className="text-3xl font-semibold tracking-tight sm:text-4xl"
+            />
             <p className="mt-3 text-sm">
               ¿Ya tienes una cuenta?{' '}
               <Link

@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router";
 import { useAuth } from "../context/auth";
 
 export default function ProtectedRoute() {
-  const { session, loading } = useAuth();
+  const { user, loading } = useAuth();
   
   const location = useLocation();
 
@@ -10,7 +10,7 @@ export default function ProtectedRoute() {
     return <p>Cargando sesión...</p>;
   }
 
-  if (!session) {
+  if (!user) {
     return <Navigate replace state={{ from: location }} to="/login" />;
   }
 
