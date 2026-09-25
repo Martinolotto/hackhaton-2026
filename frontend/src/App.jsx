@@ -14,7 +14,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <PageCurtainStage>
+
           <Routes>
             <Route path="/" element={<HomePrueba />} />
             <Route path="/home-prueba" element={<HomePrueba />} />
@@ -33,7 +33,6 @@ export default function App() {
 
             <Route path="*" element={<Navigate replace to="/" />} />
           </Routes>
-        </PageCurtainStage>
       </AuthProvider>
     </BrowserRouter>
   );
