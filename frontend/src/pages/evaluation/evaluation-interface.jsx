@@ -53,7 +53,7 @@ function buildComparison(initialEvaluation, reevaluation) {
   return { changed, remained };
 }
 
-function InteractionRecap({ interaction }) {
+function InteractionRecap({ interaction, image }) {
   return (
     <details className="evaluation-recap">
       <summary>Ver interacción analizada</summary>
@@ -64,6 +64,12 @@ function InteractionRecap({ interaction }) {
             <dd>{interaction[key] || "No informado / desconocido"}</dd>
           </div>
         ))}
+        {image && (
+          <div>
+            <dt>Captura aportada</dt>
+            <dd>{image.name} · conservada solo durante este recorrido</dd>
+          </div>
+        )}
       </dl>
     </details>
   );
@@ -115,6 +121,7 @@ function EvaluationComparison({ initialEvaluation, reevaluation }) {
 export default function EvaluationInterface() {
   const [status, setStatus] = useState("editing");
   const [interaction, setInteraction] = useState(null);
+  const [interactionImage, setInteractionImage] = useState(null);
   const [initialEvaluation, setInitialEvaluation] = useState(null);
   const [reevaluation, setReevaluation] = useState(null);
   const [requestError, setRequestError] = useState(null);
@@ -135,7 +142,7 @@ export default function EvaluationInterface() {
     return data.session.access_token;
   };
 
-  const requestEvaluation = async (nextInteraction, verificationResult) => {
+  const requestEvaluation = async (nextInteraction, verificationResult, image) => {
     const accessToken = await obtainAccessToken();
     const request = { interaction: nextInteraction, verificationResult };
 
@@ -151,19 +158,19 @@ export default function EvaluationInterface() {
       return fixture;
     }
 
-    return createEvaluation({ ...request, accessToken });
+    return createEvaluation({ ...request, image, accessToken });
   };
 
   const focusResult = () => {
     window.requestAnimationFrame(() => resultRef.current?.focus());
   };
 
-  const handleInitialSubmit = async (nextInteraction) => {
+  const handleInitialSubmit = async (nextInteraction, image) => {
     setStatus("submitting_initial");
     setRequestError(null);
 
     try {
-      const result = await requestEvaluation(nextInteraction, null);
+      const result = await requestEvaluation(nextInteraction, null, image);
       if (result.phase !== "initial") {
         throw new EvaluationApiError("La API no devolvió una evaluación inicial válida.", {
           status: 503,
@@ -171,6 +178,7 @@ export default function EvaluationInterface() {
         });
       }
       setInteraction(nextInteraction);
+      setInteractionImage(image);
       setInitialEvaluation(result);
       setStatus("evaluated_initial");
       focusResult();
@@ -191,7 +199,7 @@ export default function EvaluationInterface() {
     setRequestError(null);
 
     try {
-      const result = await requestEvaluation(interaction, verificationResult);
+      const result = await requestEvaluation(interaction, verificationResult, interactionImage);
       if (result.phase !== "reevaluated") {
         throw new EvaluationApiError("La API no devolvió una reevaluación válida.", {
           status: 503,
@@ -214,6 +222,7 @@ export default function EvaluationInterface() {
   const startNewJourney = () => {
     setStatus("editing");
     setInteraction(null);
+    setInteractionImage(null);
     setInitialEvaluation(null);
     setReevaluation(null);
     setRequestError(null);
@@ -281,7 +290,7 @@ export default function EvaluationInterface() {
               </section>
             )}
             <div className="evaluation-results-flow" ref={resultRef} tabIndex="-1">
-            <InteractionRecap interaction={interaction} />
+            <InteractionRecap interaction={interaction} image={interactionImage} />
 
             {reevaluation && (
               <EvaluationComparison

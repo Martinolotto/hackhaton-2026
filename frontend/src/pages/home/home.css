@@ -61,3 +61,10 @@
 @media (prefers-reduced-motion: reduce) { .home-landing *, .home-landing *::before, .home-landing *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
 @media (max-width: 800px) { .landing-nav, .landing-hero, .landing-statement, .situation-list, .landing-method, .landing-closing { width: min(100% - 32px, 1280px); }.landing-nav { min-height: 72px; }.landing-nav-links { display: none; }.landing-nav-actions { gap: 8px; }.landing-login-link { padding-inline: 5px; }.landing-nav-cta { padding-inline: 13px; font-size: .74rem; }.landing-hero { grid-template-columns: 1fr; min-height: auto; gap: 35px; padding: 82px 0 104px; }.signal-orbit { width: min(86vw, 400px); justify-self: center; }.landing-statement, .landing-method { grid-template-columns: 1fr; padding: 94px 0; }.landing-statement p { margin-top: 0; }.situation-list { padding-bottom: 96px; }.situation-row { grid-template-columns: 28px 1fr; gap: 16px; padding: 30px 0; }.situation-copy { grid-column: 2; margin-top: -5px; }.landing-closing { min-height: 55dvh; padding: 90px 0; } }
 @media (max-width: 430px) { .landing-login-link { display: none; }.landing-hero-copy h1 { font-size: clamp(3.25rem, 16vw, 4.2rem); }.signal-orbit { width: min(92vw, 360px); }.signal-caption { font-size: .63rem; }.landing-hero-actions { gap: 17px; }.landing-secondary-action { font-size: .82rem; } }
+
+/* Reduce el salto entre el display del landing y su texto de apoyo. */
+.landing-hero-copy h1 { font-size: clamp(3.25rem, 6.8vw, 5.5rem); }
+.landing-statement h2 { font-size: clamp(2.35rem, 4.5vw, 4.25rem); }
+.landing-method h2 { font-size: clamp(2.35rem, 4.3vw, 4.25rem); }
+.landing-closing h2 { font-size: clamp(2.75rem, 5.8vw, 5.25rem); }
+.situation-row h3 { font-size: clamp(1.6rem, 2.8vw, 2.5rem); }

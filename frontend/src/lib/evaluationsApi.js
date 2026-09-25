@@ -17,7 +17,7 @@ const RESPONSE_KEYS = [
 const ERROR_MESSAGES = {
   400: "Revisa los datos ingresados: la solicitud no cumple el formato esperado.",
   401: "Tu sesión falta o venció. Inicia sesión nuevamente para continuar.",
-  413: "La información enviada supera el tamaño permitido. Reduce el texto e intenta nuevamente.",
+  413: "La información enviada supera el tamaño permitido. Reduce el texto o la imagen e intenta nuevamente.",
   429: "Alcanzaste el límite temporal de evaluaciones.",
   500: "Ocurrió un error interno. Intenta nuevamente más tarde.",
   503: "El servicio de evaluación no está disponible en este momento. Intenta nuevamente más tarde.",
@@ -147,7 +147,7 @@ async function readJson(response) {
   }
 }
 
-export async function createEvaluation({ interaction, verificationResult, accessToken, signal }) {
+export async function createEvaluation({ interaction, verificationResult, image = null, accessToken, signal }) {
   if (!accessToken) {
     throw new EvaluationApiError(ERROR_MESSAGES[401], {
       status: 401,
@@ -156,16 +156,28 @@ export async function createEvaluation({ interaction, verificationResult, access
   }
 
   let response;
+  const evaluation = { interaction, verificationResult };
+  const headers = {
+    Accept: "application/json",
+    Authorization: `Bearer ${accessToken}`,
+  };
+  let body;
+
+  if (image) {
+    const form = new FormData();
+    form.append("evaluation", JSON.stringify(evaluation));
+    form.append("image", image, image.name);
+    body = form;
+  } else {
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify(evaluation);
+  }
 
   try {
     response = await fetch(getApiUrl(), {
       method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ interaction, verificationResult }),
+      headers,
+      body,
       signal,
     });
   } catch (error) {

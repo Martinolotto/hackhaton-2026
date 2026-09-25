@@ -8,12 +8,13 @@
 ## Resumen
 
 Construir una vertical web autenticada que reciba una interacción digital y su
-contexto, solicite a Gemini una evaluación estructurada, valide íntegramente esa
-salida y la muestre sin persistir el caso. React reutiliza Supabase Auth, envía el
+contexto, solicite a NVIDIA una evaluación estructurada con Gemini como failover,
+valide íntegramente esa salida y la muestre sin persistir el caso. React reutiliza Supabase Auth, envía el
 access token y mantiene el recorrido en memoria. Express verifica el token con
 `supabase.auth.getClaims(token)`, aplica un límite básico por `claims.sub`, valida
-el request y encapsula `@google/genai`. Gemini recibe únicamente texto y contexto,
-sin herramientas, navegación, grounding ni búsqueda. La misma operación stateless
+el request y encapsula `@google/genai`. Gemini recibe texto y, opcionalmente, una
+captura como contexto multimodal, sin herramientas, navegación, grounding ni
+búsqueda. La misma operación stateless
 atiende evaluación inicial y una reevaluación mediante `verificationResult`.
 
 ## Contexto técnico
@@ -25,7 +26,7 @@ navegadores modernos.
 **Dependencias principales**: React 19, Vite 8, React Router 8, Tailwind CSS 4 y
 `@supabase/supabase-js` existentes en frontend; Express 5, CORS y dotenv existentes
 en backend; nuevas en backend: `@supabase/supabase-js`, `@google/genai`,
-`express-rate-limit` y Zod 4.
+`express-rate-limit`, `multer`, `openai` y Zod 4.
 
 **Almacenamiento**: ninguno. No hay tablas, archivos de caso, sesiones de backend,
 cache persistente ni Supabase Database. El `MemoryStore` del rate limiter conserva
@@ -37,18 +38,19 @@ frontend; recorridos end-to-end manuales y cronometrados definidos en
 [quickstart.md](quickstart.md).
 
 **Plataforma objetivo**: frontend SPA en Vercel; backend Node.js en una instancia
-de Render; Supabase Auth y Gemini Developer API como servicios externos.
+de Render; Supabase Auth, NVIDIA NIM y Gemini Developer API como servicios externos.
 
 **Objetivos de rendimiento**: recorrido representativo hasta evaluación inicial
-en menos de cinco minutos excluyendo demoras externas; timeout de Gemini de 20
-segundos por operación; respuesta inmediata y controlada ante autenticación,
+en menos de cinco minutos excluyendo demoras externas; NVIDIA hasta 5 segundos y
+cada Gemini hasta 10 segundos dentro de un presupuesto total de 25 segundos; respuesta inmediata y controlada ante autenticación,
 validación o rate limit fallidos.
 
-**Restricciones**: body JSON máximo de 32 KiB; endpoint autenticado; diez requests
-de evaluación por usuario cada quince minutos; sin reintentos automáticos a Gemini
-en el MVP; salida completa o error, nunca parcial; sin logs de contenido del caso,
-token o salida completa de Gemini; URL tratada solo como texto; ningún secreto
-`VITE_*`.
+**Restricciones**: body JSON máximo de 32 KiB o multipart con una captura opcional
+PNG/JPEG/WEBP de hasta 4 MB; endpoint autenticado; diez requests de evaluación por
+usuario cada quince minutos; un intento por candidato y failover solo ante
+errores transitorios clasificados; salida completa o error, nunca parcial; sin logs de
+contenido del caso, imagen, base64, token o salida completa del proveedor; URL tratada
+solo como texto; ningún secreto `VITE_*`.
 
 **Escala/alcance**: hackathon de dos personas, una operación HTTP, un recorrido de
 evaluación y una única reevaluación en la UI, cuatro casos mínimos de aceptación y
@@ -67,8 +69,8 @@ rate limit.
 | Un producto/monorepo/Spec Kit | No se crean proyectos SDD ni `.specify/` por dominio. |
 | Separación y autonomía | El contrato compartido congela el límite; Martino trabaja backend y Gastón frontend sin modificarlo unilateralmente. |
 | Supabase-first para CRUD | No hay CRUD ni tablas. Supabase entra al backend únicamente para verificar Auth, como fue aprobado. |
-| Express para lógica específica | Auth de API, protección de cuota y evaluación Gemini permanecen en Express. |
-| Secretos seguros | `GEMINI_API_KEY` solo existe en Render/backend; ningún secreto llega al frontend. |
+| Express para lógica específica | Auth de API, protección de cuota y evaluación NVIDIA/Gemini permanecen en Express. |
+| Secretos seguros | `NVIDIA_API_KEY` y `GEMINI_API_KEY` solo existen en Render/backend; ningún secreto llega al frontend. |
 | `main` desplegable | El trabajo se integra en `develop`, se valida y recién después se promueve a `main`. |
 | Simplicidad de 24 horas | Un endpoint, estado local, MemoryStore y pruebas nativas evitan infraestructura adicional. |
 | Contrato explícito | [contracts/evaluations.openapi.yaml](contracts/evaluations.openapi.yaml) fija Auth, inputs, outputs y errores. |
@@ -105,7 +107,8 @@ backend/
 │   │   ├── env.js
 │   │   ├── cors.js
 │   │   ├── supabase.js
-│   │   └── gemini.js
+│   │   ├── gemini.js
+│   │   └── nvidia.js
 │   ├── controllers/
 │   │   ├── health.controller.js
 │   │   └── evaluation.controller.js
@@ -122,7 +125,10 @@ backend/
 │   ├── schemas/
 │   │   └── evaluation.schemas.js
 │   ├── services/
-│   │   └── evaluation.service.js
+│   │   ├── evaluation.service.js
+│   │   └── providers/
+│   │       ├── nvidia.provider.js
+│   │       └── gemini.provider.js
 │   ├── app.js
 │   └── server.js
 ├── test/
@@ -162,12 +168,13 @@ específica; no se crean modelos de persistencia, repositorios ni carpetas vací
 
 1. `ProtectedRoute` exige una sesión Supabase vigente.
 2. La página recopila la interacción y advierte sobre información sensible.
-3. `evaluationsApi.js` obtiene el access token de la sesión actual y envía el body
-   junto con `Authorization: Bearer <token>` a `VITE_API_URL`.
-4. Express procesa: JSON con límite → CORS → Auth → rate limit por `userId` →
-   validación Zod → controller.
+3. `evaluationsApi.js` obtiene el access token de la sesión actual y envía JSON si
+   no hay imagen o multipart (`evaluation` + `image`) si existe captura, junto con
+   `Authorization: Bearer <token>` a `VITE_API_URL`.
+4. Express procesa: JSON o multipart en memoria → CORS → Auth → rate limit por
+   `userId` → validación de archivo y Zod → controller.
 5. El servicio serializa los datos variables como JSON no confiable y los envía a
-   Gemini con instrucciones invariantes, structured output y `store: false`.
+   NVIDIA; ante fallo transitorio continúa con los dos Gemini configurados.
 6. El backend hace `JSON.parse`, valida la respuesta completa con Zod y recién
    entonces responde 200. Cualquier fallo del evaluador termina en 503.
 7. El frontend renderiza las doce secciones y conserva interacción y evaluación
@@ -176,7 +183,8 @@ específica; no se crean modelos de persistencia, repositorios ni carpetas vací
 ### Reevaluación
 
 El frontend permite un solo envío con `verificationResult` y reenvía la interacción
-original. Conserva en memoria tanto la evaluación inicial como la reevaluación
+original y, si existe, la misma captura mientras el `File` continúe disponible.
+Conserva en memoria tanto la evaluación inicial como la reevaluación
 `phase: reevaluated` y muestra una comparación visible que distingue qué cambió,
 qué permaneció, qué incertidumbre continúa y qué información faltante continúa.
 Después deshabilita definitivamente otra reevaluación durante ese recorrido. Esta
@@ -194,20 +202,29 @@ stateless: valida que cada request contenga cero o un resultado, pero no crea un
 - No se usan `getUser()`, JWT propio, JWKS manual, `service_role`, secret key,
   `JWT_SECRET` ni acceso a base de datos.
 
-### Evaluación Gemini
+### Evaluación y providers
+
+- Orden fijo y configurable por modelo: NVIDIA → Gemini principal → Gemini fallback.
+- NVIDIA usa Chat Completions OpenAI-compatible; texto como contenido normal e
+  imagen como data URL en `image_url`. Se exige JSON puro en el prompt y siempre
+  se aplica `JSON.parse` más Zod porque el endpoint del modelo no documenta soporte
+  específico de `response_format`.
 
 - SDK `@google/genai`, Interactions API y `store: false`.
-- Modelo leído de `GEMINI_MODEL`; valor inicial operativo propuesto:
-  `gemini-3.8-flash`, sujeto a comprobar acceso con la API key del proyecto.
+- Modelos leídos de `GEMINI_MODEL` y `GEMINI_FALLBACK_MODEL`, ambos con capacidad
+  multimodal y configurados fuera del código.
 - Sin `tools`, Google Search, URL Context, grounding ni funciones externas.
 - Zod es la fuente runtime: un schema de contenido sin `phase` genera mediante
   `z.toJSONSchema()` el JSON Schema enviado a Gemini; el backend agrega la fase
   derivada del request y valida después la respuesta contractual completa.
-- `system_instruction` contiene reglas invariantes; el caso se envía solo en
-  `input` como JSON etiquetado como dato no confiable.
-- Thinking `low`, máximo de salida de 4.096 tokens, timeout total de 20 segundos
-  y sin retry automático para proteger latencia y cuota. Cuota, timeout, red,
-  parseo o validación inválida se mapean a 503.
+- `system_instruction` contiene reglas invariantes; el caso se envía en `input`
+  como JSON etiquetado como dato no confiable. Si existe captura se agrega como
+  bloque `image` inline y se aclara que es contexto no verificado.
+- Thinking `low` en Gemini y máximo de salida de 4.096 tokens. NVIDIA dispone de
+  hasta 5 segundos y cada Gemini hasta 10 segundos del presupuesto global de 25.
+  No hay retries automáticos ni loops; se avanza solo ante 429 temporal,
+  502/503/504, timeout o conexión temporal reconocida. Los fallos no transitorios,
+  de parseo o validación inválida no activan cascada y terminan controladamente.
 
 ### Protección de cuota
 
@@ -217,13 +234,15 @@ stateless: valida que cada request contenga cero o un resultado, pero no crea un
 fallen, porque igualmente protegen el acceso al evaluador. Es protección básica de
 una instancia; reinicios o escalado horizontal reinician o multiplican la cuota.
 
-### Preparación para imágenes futuras
+### Captura opcional en memoria
 
-La frontera del servicio recibe un objeto de input y no concatena una firma de
-parámetros posicionales. Una ampliación posterior podrá agregar contenido
-multimodal en otra versión del input sin cambiar el significado de los campos
-textuales. Este plan no crea multipart, uploads, Storage, tablas ni esquemas de
-imagen.
+Sin imagen se conserva `application/json` y el input textual existente. Con imagen,
+el frontend usa `multipart/form-data` con el campo `evaluation` serializado y un
+único archivo `image`. Multer usa `memoryStorage`, valida un máximo de 4 MB y el
+backend comprueba MIME y firma PNG/JPEG/WEBP antes de invocar Gemini. El buffer se
+convierte temporalmente a base64 únicamente para el bloque multimodal del SDK; no
+se escribe a disco, no se persiste, no se registra y no se crea Storage, tabla,
+OCR, EXIF ni herramienta externa.
 
 ## Responsabilidades para trabajo paralelo
 

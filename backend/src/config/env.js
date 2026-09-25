@@ -12,6 +12,25 @@ function required(name) {
   return value;
 }
 
+function optional(name) {
+  return process.env[name]?.trim() || null;
+}
+
+function positiveInteger(name, fallback) {
+  const rawValue = process.env[name]?.trim();
+
+  if (!rawValue) {
+    return fallback;
+  }
+
+  const value = Number.parseInt(rawValue, 10);
+  if (!/^\d+$/.test(rawValue) || !Number.isInteger(value) || value <= 0) {
+    throw new Error(`${name} debe ser un entero positivo.`);
+  }
+
+  return value;
+}
+
 export const env = {
   port: Number.isNaN(port) ? 3000 : port,
   nodeEnv: process.env.NODE_ENV ?? "development",
@@ -28,15 +47,32 @@ export const env = {
   get geminiApiKey() {
     return required("GEMINI_API_KEY");
   },
+  get nvidiaApiKey() {
+    return optional("NVIDIA_API_KEY");
+  },
+  get nvidiaModel() {
+    return optional("NVIDIA_MODEL");
+  },
+  get nvidiaTimeoutMs() {
+    return positiveInteger("NVIDIA_TIMEOUT_MS", 5_000);
+  },
   get geminiModel() {
     return required("GEMINI_MODEL");
   },
   get geminiFallbackModel() {
     return required("GEMINI_FALLBACK_MODEL");
   },
+  get geminiTimeoutMs() {
+    return positiveInteger("GEMINI_TIMEOUT_MS", 10_000);
+  },
+  get evaluationTimeoutMs() {
+    return positiveInteger("EVALUATION_TIMEOUT_MS", 25_000);
+  },
 };
 
 export function validateEvaluationEnvironment() {
+  const nvidiaApiKey = env.nvidiaApiKey;
+  const nvidiaModel = env.nvidiaModel;
   const geminiModel = env.geminiModel;
   const geminiFallbackModel = env.geminiFallbackModel;
 
@@ -47,8 +83,13 @@ export function validateEvaluationEnvironment() {
   return {
     supabaseUrl: env.supabaseUrl,
     supabasePublishableKey: env.supabasePublishableKey,
+    nvidiaApiKey,
+    nvidiaModel,
+    nvidiaTimeoutMs: env.nvidiaTimeoutMs,
     geminiApiKey: env.geminiApiKey,
     geminiModel,
     geminiFallbackModel,
+    geminiTimeoutMs: env.geminiTimeoutMs,
+    evaluationTimeoutMs: env.evaluationTimeoutMs,
   };
 }

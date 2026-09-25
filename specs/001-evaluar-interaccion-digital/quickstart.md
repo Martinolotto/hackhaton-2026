@@ -1,13 +1,13 @@
 # Quickstart de validación end-to-end
 
 Esta guía se ejecuta después de implementar las tareas. No instala ni configura
-servicios nuevos fuera de Vercel, Render, Supabase Auth y Gemini ya aprobados.
+servicios nuevos fuera de Vercel, Render, Supabase Auth, NVIDIA y Gemini ya aprobados.
 
 ## 1. Prerrequisitos
 
 - Node.js 22 o posterior compatible con las versiones fijadas en los lockfiles.
 - Una sesión de prueba válida del proyecto Supabase.
-- Una API key Gemini con acceso al modelo configurado.
+- API keys NVIDIA y Gemini con acceso a los modelos configurados.
 - Dos terminales locales.
 
 No copiar tokens ni API keys a documentación, commits, screenshots o logs.
@@ -22,12 +22,20 @@ NODE_ENV
 CORS_ORIGINS
 SUPABASE_URL
 SUPABASE_PUBLISHABLE_KEY
+NVIDIA_API_KEY
+NVIDIA_MODEL
+NVIDIA_TIMEOUT_MS
 GEMINI_API_KEY
 GEMINI_MODEL
+GEMINI_FALLBACK_MODEL
+GEMINI_TIMEOUT_MS
+EVALUATION_TIMEOUT_MS
 ```
 
-Valor inicial propuesto de `GEMINI_MODEL`: `gemini-3.8-flash`. Confirmar que la
-API key real tiene acceso antes de la demo; no implementar fallback silencioso.
+Confirmar antes de la demo que NVIDIA y ambos modelos Gemini admiten la entrada
+multimodal. El orden es NVIDIA → Gemini principal → Gemini fallback, un intento por
+candidato, NVIDIA hasta 5 segundos, cada Gemini hasta 10 y 25 segundos totales. Si
+falta una variable NVIDIA, el recorrido comienza directamente con Gemini.
 
 Frontend, únicamente en `frontend/.env` local y Vercel:
 
@@ -38,7 +46,7 @@ VITE_API_URL
 ```
 
 `VITE_API_URL` local apunta al backend local y en producción al servicio Render.
-Nunca crear `VITE_GEMINI_API_KEY`.
+Nunca crear variables `VITE_*` para NVIDIA o Gemini.
 
 ## 3. Instalación reproducible y pruebas automáticas
 
@@ -52,11 +60,14 @@ Resultados esperados:
 
 - schemas aceptan requests iniciales y de reevaluación válidos;
 - requests incompletos o con campos extra terminan en 400;
-- token ausente/inválido termina en 401 antes del limitador y Gemini;
+- token ausente/inválido termina en 401 antes del limitador y los providers;
 - la respuesta mock cumple el contrato completo;
 - timeout, cuota o respuesta mock inválida terminan en 503;
+- NVIDIA exitoso evita Gemini y solo fallos transitorios activan la cadena;
 - el límite por `userId` termina en 429;
 - ninguna prueba requiere base de datos.
+- PNG, JPEG y WEBP válidos se aceptan; formato o tamaño inválido se rechaza;
+- el failover conserva la misma entrada multimodal y ninguna captura se persiste.
 
 ```bash
 cd ../frontend
@@ -140,6 +151,13 @@ Resultado esperado:
   sistema;
 - el frontend no presenta otra acción de reevaluación después del éxito.
 
+### Captura opcional
+
+Seleccionar una captura PNG, JPEG o WEBP menor o igual a 4 MB y comprobar preview,
+nombre, tamaño, reemplazo y eliminación. Con captura, el request usa multipart con
+`evaluation` e `image`; sin captura conserva JSON. La reevaluación reenvía el mismo
+archivo mientras la página siga abierta. Refrescar descarta el archivo local.
+
 ## 6. Fixtures de aceptación
 
 Ejecutar los tres casos definidos en
@@ -171,9 +189,11 @@ Validar de forma determinística con doubles/mocks de integración:
 | JSON/campos inválidos | `400 INVALID_REQUEST` |
 | Token ausente, inválido o expirado | `401 UNAUTHORIZED` |
 | Body mayor a 32 KiB | `413 PAYLOAD_TOO_LARGE` |
+| Captura no permitida o firma incompatible | `400 INVALID_REQUEST` |
+| Captura mayor a 4 MB | `413 PAYLOAD_TOO_LARGE` |
 | Más de diez requests/15 min para el mismo usuario | `429 RATE_LIMITED` y `Retry-After` |
-| Timeout, cuota o red Gemini | `503 EVALUATION_UNAVAILABLE` |
-| JSON Gemini no parseable o salida que no cumple Zod | `503 EVALUATION_UNAVAILABLE` |
+| Todos los providers transitoriamente no disponibles | `503 EVALUATION_UNAVAILABLE` |
+| JSON del proveedor no parseable o salida que no cumple Zod | `503 EVALUATION_UNAVAILABLE` |
 | Error inesperado | `500 INTERNAL_ERROR` sin detalles privados |
 
 En todos los fallos, comprobar que no aparece una evaluación total ni parcial.
@@ -183,7 +203,7 @@ En todos los fallos, comprobar que no aparece una evaluación total ni parcial.
 - Confirmar que el request y response no contienen `caseId` ni `evaluationId`.
 - Reiniciar backend/frontend: ningún caso debe reaparecer.
 - Revisar que no existan writes a Supabase Database, filesystem o store externo.
-- Revisar que logs no incluyan body, token, prompt ni respuesta completa.
+- Revisar que logs no incluyan body, imagen/base64, token, prompt ni respuesta completa.
 
 ## 10. Revisión previa a producción
 

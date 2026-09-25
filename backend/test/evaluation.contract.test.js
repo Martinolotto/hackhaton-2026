@@ -4,6 +4,7 @@ import { createApp } from "../src/app.js";
 import { createEvaluationRateLimit } from "../src/middlewares/evaluationRateLimit.js";
 import { createRequireAuth } from "../src/middlewares/authenticate.js";
 import { createEvaluationService } from "../src/services/evaluation.service.js";
+import { createGeminiProvider } from "../src/services/providers/gemini.provider.js";
 import {
   buildEvaluationContent,
   buildEvaluationResponse,
@@ -12,6 +13,7 @@ import {
 
 process.env.GEMINI_MODEL ??= "test-model";
 process.env.GEMINI_FALLBACK_MODEL ??= "test-fallback-model";
+process.env.NVIDIA_MODEL ??= "test-nvidia-model";
 
 const silentLogger = { info() {} };
 
@@ -41,11 +43,9 @@ function authForTests() {
 function serviceReturning(contentFactory = () => buildEvaluationContent()) {
   return createEvaluationService({
     logger: silentLogger,
-    createInteraction: async (request) => {
-      const evaluationRequest = JSON.parse(request.input.split("\n").slice(1).join("\n"));
-      return {
-        output_text: JSON.stringify(contentFactory(evaluationRequest)),
-      };
+    evaluateNvidia: async ({ textInput }) => {
+      const evaluationRequest = JSON.parse(textInput.split("\n").slice(1).join("\n"));
+      return JSON.stringify(contentFactory(evaluationRequest));
     },
   });
 }
@@ -132,19 +132,20 @@ test("produce evaluaciones initial y reevaluated compatibles con el contrato", a
   });
 });
 
-test("mapea JSON Gemini inválido, salida inválida y errores a 503 sin respuesta parcial", async () => {
+test("mapea JSON de proveedor inválido, salida inválida y errores a 503 sin respuesta parcial", async () => {
   const services = [
     createEvaluationService({
       logger: silentLogger,
-      createInteraction: async () => ({ output_text: "not-json" }),
+      evaluateNvidia: async () => "not-json",
     }),
     createEvaluationService({
       logger: silentLogger,
-      createInteraction: async () => ({ output_text: JSON.stringify({}) }),
+      evaluateNvidia: async () => JSON.stringify({}),
     }),
     createEvaluationService({
       logger: silentLogger,
-      createInteraction: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
+      evaluateNvidia: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
+      evaluateGemini: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
     }),
   ];
 
@@ -224,11 +225,12 @@ test("envía la URL como texto sin tools, Search, URL Context ni navegación", a
   let capturedOptions;
   const evaluate = createEvaluationService({
     logger: silentLogger,
-    createInteraction: async (request, options) => {
+    evaluateNvidia: async () => Promise.reject(Object.assign(new Error("unavailable"), { status: 503 })),
+    evaluateGemini: createGeminiProvider({ createInteraction: async (request, options) => {
       capturedRequest = request;
       capturedOptions = options;
       return { output_text: JSON.stringify(buildEvaluationContent()) };
-    },
+    } }),
   });
   const app = createApp({ requireAuthMiddleware: authForTests(), evaluate });
 
@@ -242,6 +244,6 @@ test("envía la URL como texto sin tools, Search, URL Context ni navegación", a
   assert.equal(capturedRequest.input.includes(evaluationCases.caseC.interaction.url), true);
   assert.equal(capturedRequest.response_format.type, "text");
   assert.equal(capturedRequest.response_format.mime_type, "application/json");
-  assert.equal(capturedOptions.timeout, 20_000);
+  assert.equal(capturedOptions.timeout, 10_000);
   assert.equal(capturedOptions.maxRetries, 0);
 });
