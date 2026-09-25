@@ -1,0 +1,114 @@
+.auth-page {
+  --hp-canvas: #f8fafc;
+  --hp-surface: #ffffff;
+  --hp-surface-subtle: #f1f5f9;
+  --hp-ink: #0f172a;
+  --hp-muted: #475569;
+  --hp-border: #cbd5e1;
+  --hp-border-strong: #64748b;
+  --hp-primary: #2563eb;
+  --hp-primary-hover: #1d4ed8;
+  --hp-accent: #0f766e;
+  --hp-focus: #2563eb;
+  --hp-primary-soft: #dbeafe;
+  min-height: 100dvh;
+  color: var(--hp-ink);
+  background: var(--hp-canvas);
+  font-family: "Geist Variable", Geist, ui-sans-serif, system-ui, sans-serif;
+}
+
+.auth-page ::selection {
+  color: var(--hp-ink);
+  background: var(--hp-primary-soft);
+}
+
+.auth-page main {
+  background: var(--hp-canvas);
+}
+
+.auth-page .bg-white {
+  background: var(--hp-surface);
+}
+
+.auth-page .text-black,
+.auth-page .text-black\/80 {
+  color: var(--hp-ink);
+}
+
+.auth-page .border-black,
+.auth-page .border-l-black,
+.auth-page .border-t-black {
+  border-color: var(--hp-border);
+}
+
+.auth-page input {
+  min-width: 0;
+  border-color: var(--hp-border);
+  color: var(--hp-ink);
+  background: var(--hp-surface);
+  caret-color: var(--hp-primary);
+}
+
+.auth-page form > label,
+.auth-page form > label > span {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.auth-page form > label > span {
+  width: 100%;
+}
+
+.auth-page input:focus-visible,
+.auth-page button:focus-visible,
+.auth-page a:focus-visible {
+  outline: 2px solid var(--hp-focus);
+  outline-offset: 2px;
+}
+
+.auth-page button {
+  border-color: var(--hp-border);
+  border-radius: 8px;
+  color: var(--hp-ink);
+  background: var(--hp-surface);
+  transition: background-color 180ms ease, border-color 180ms ease;
+}
+
+.auth-page button:hover:not(:disabled) {
+  border-color: var(--hp-border-strong);
+  background: var(--hp-surface-subtle);
+}
+
+.auth-page button[type="submit"] {
+  border-color: var(--hp-primary);
+  color: var(--hp-surface);
+  background: var(--hp-primary);
+}
+
+.auth-page button[type="submit"]:hover:not(:disabled) {
+  border-color: var(--hp-primary-hover);
+  background: var(--hp-primary-hover);
+}
+
+.auth-page input[type="checkbox"] {
+  accent-color: var(--hp-primary);
+}
+
+.auth-page form a,
+.auth-page p a {
+  color: var(--hp-primary-hover);
+  text-decoration-color: currentcolor;
+  text-underline-offset: 4px;
+}
+
+.auth-page [role="status"] {
+  border-color: var(--hp-border-strong);
+  color: var(--hp-muted);
+  background: var(--hp-surface-subtle);
+}
+
+@media (max-width: 640px) {
+  .auth-page main {
+    padding-inline: 1rem;
+  }
+}

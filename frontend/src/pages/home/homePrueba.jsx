@@ -1,169 +1,127 @@
-import { ArrowUpRight, Check, Pause, Search } from "lucide-react";
+import {
+  ArrowUpRight,
+  Check,
+  FileSearch,
+  MessageSquareText,
+  Pause,
+  Search,
+} from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
+import Nav from "../../components/navegation/nav";
+import MaskedHeading from "../../components/react-bits/MaskedHeading";
+import heroImage from "../../assets/hero.png";
 import "./homePrueba.css";
+
+const MotionLink = motion.create(Link);
 
 const situations = [
   {
     context: "Una cuenta conocida",
-    title: "El nombre te resulta familiar. El pedido, no tanto.",
-    copy: "Una identidad visible puede ser legítima y aun así no confirmar quién envió el mensaje. Volvé a contactar a esa persona por un medio que ya conozcas.",
+    title: "El nombre resulta familiar. El pedido, no tanto.",
+    copy: "Una identidad visible puede ser legítima y aun así no confirmar quién envió el mensaje. Volver a contactar a esa persona por un medio conocido agrega evidencia independiente.",
+    icon: MessageSquareText,
   },
   {
     context: "Una urgencia inesperada",
-    title: "La presión pide velocidad. Vos podés pedir un minuto.",
-    copy: "Alertas, premios o problemas de cuenta pueden buscar una acción inmediata. Antes de abrir un enlace o compartir datos, revisá qué te están pidiendo.",
+    title: "La presión pide velocidad. Tú puedes pedir un minuto.",
+    copy: "Alertas, premios o problemas de cuenta pueden buscar una acción inmediata. Antes de abrir un enlace o compartir datos, conviene revisar qué se solicita y desde dónde.",
+    icon: Pause,
   },
   {
     context: "Una oferta convincente",
     title: "Que algo parezca real no reemplaza comprobarlo.",
-    copy: "Una oferta, un perfil o una web puede verse coherente. Contrastá la información con una fuente independiente antes de avanzar.",
+    copy: "Una oferta, un perfil o una web puede verse coherente. Contrastar la información con una fuente independiente permite decidir con más contexto.",
+    icon: FileSearch,
   },
 ];
 
 const method = [
   {
-    title: "Detenete",
-    copy: "La urgencia no tiene que decidir por vos.",
+    title: "Detente",
+    copy: "La urgencia no tiene que decidir por ti.",
     icon: Pause,
   },
   {
-    title: "Observá el contexto",
-    copy: "Revisá quién escribe, qué pide y adónde lleva.",
+    title: "Observa el contexto",
+    copy: "Revisa quién escribe, qué solicita y adónde conduce.",
     icon: Search,
   },
   {
-    title: "Contrastá",
-    copy: "Buscá una fuente o un canal conocido e independiente.",
+    title: "Contrasta",
+    copy: "Busca una fuente o un canal conocido e independiente.",
     icon: Check,
   },
 ];
 
-function SignalConstellation() {
-  return (
-    <div className="hp-constellation" aria-hidden="true">
-      <svg
-        className="hp-constellation-graphic"
-        viewBox="0 0 620 620"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <g className="hp-network-lines">
-          <path d="M105 224 209 117 331 171 455 94 526 221 463 326 536 455 385 522 276 440 137 485 86 348 105 224Z" />
-          <path d="m209 117 67 323M331 171 137 485M455 94 276 440M526 221 86 348M463 326 105 224M385 522 331 171" />
-        </g>
-
-        <g className="hp-orbit-ring">
-          <ellipse cx="311" cy="310" rx="235" ry="138" transform="rotate(-24 311 310)" />
-          <ellipse cx="311" cy="310" rx="221" ry="118" transform="rotate(61 311 310)" />
-        </g>
-
-        <g className="hp-signal-nodes">
-          <circle className="hp-node hp-node-violet" cx="105" cy="224" r="7" />
-          <path className="hp-node hp-node-amber" d="m209 106 10 18h-20l10-18Z" />
-          <circle className="hp-node hp-node-teal" cx="331" cy="171" r="6" />
-          <path className="hp-node hp-node-violet" d="m455 82 11 20h-22l11-20Z" />
-          <circle className="hp-node hp-node-amber" cx="526" cy="221" r="7" />
-          <path className="hp-node hp-node-teal" d="m463 314 11 20h-22l11-20Z" />
-          <circle className="hp-node hp-node-violet" cx="536" cy="455" r="6" />
-          <path className="hp-node hp-node-amber" d="m385 510 11 20h-22l11-20Z" />
-          <circle className="hp-node hp-node-teal" cx="276" cy="440" r="7" />
-          <path className="hp-node hp-node-violet" d="m137 473 11 20h-22l11-20Z" />
-          <circle className="hp-node hp-node-amber" cx="86" cy="348" r="6" />
-        </g>
-
-        <g className="hp-signal-core">
-          <circle cx="311" cy="310" r="74" />
-          <circle cx="311" cy="310" r="5" />
-          <path d="M311 236v-32M311 416v-32M237 310h-32M417 310h-32" />
-        </g>
-      </svg>
-
-      <span className="hp-signal-word hp-signal-context">contexto</span>
-      <span className="hp-signal-word hp-signal-origin">origen</span>
-      <span className="hp-signal-word hp-signal-action">acción</span>
-      <span className="hp-signal-pause">pausa</span>
-    </div>
-  );
-}
-
 export default function HomePrueba() {
+  const shouldReduceMotion = useReducedMotion();
+
   return (
     <div className="home-prueba">
       <a className="hp-skip-link" href="#contenido-home-prueba">
         Ir al contenido principal
       </a>
 
-      <header className="hp-header">
-        <nav className="hp-nav" aria-label="Navegación principal">
-          <Link className="hp-wordmark" to="/home-prueba" aria-label="A tiempo, inicio">
-            <span className="hp-wordmark-mark" aria-hidden="true" />
-            A tiempo
-          </Link>
+      <Nav />
 
-          <div className="hp-nav-actions">
-            <div className="hp-section-links" aria-label="Secciones de la página">
-              <a href="#evaluar-prueba">Evaluar</a>
-              <a href="#aprender-prueba">Aprender</a>
-            </div>
-            <Link className="hp-login" to="/login">
-              Ingresar
-            </Link>
-            <Link className="hp-primary hp-nav-primary" to="/register">
-              Crear cuenta
-            </Link>
-          </div>
-        </nav>
-      </header>
-
-      <main id="contenido-home-prueba">
-        <section className="hp-hero" aria-labelledby="hp-title">
-          <div className="hp-hero-copy">
-            <h1 id="hp-title">
-              Si algo te apura, <span>no decidas todavía.</span>
-            </h1>
-            <p>
-              A tiempo te ayuda a mirar con más calma los mensajes, enlaces,
-              ofertas y perfiles que aparecen todos los días.
-            </p>
-            <div className="hp-hero-actions">
-              <Link className="hp-primary" to="/register">
-                Crear cuenta <ArrowUpRight aria-hidden="true" size={18} />
-              </Link>
-              <a className="hp-text-link" href="#evaluar-prueba">
-                Conocé cómo funciona
-              </a>
-            </div>
-          </div>
-
-          <SignalConstellation />
-        </section>
+      <main id="contenido-home-prueba" tabIndex="-1">
+        <MaskedHeading
+          text="Si algo te apura, no decidas todavía."
+          src={heroImage}
+          fillScale={1.25}
+          parallax={26}
+          reveal="rise"
+          trigger="view"
+          drift={18}
+          brightness={1}
+          saturation={1}
+          grayscale={false}
+          duration={1.1}
+          stagger={0.09}
+          align="center"
+          weight={700}
+          tracking={-0.03}
+          lineHeight={1.06}
+          textScale={0.115}
+        />
 
         <section className="hp-statement" aria-labelledby="hp-statement-title">
-          <h2 id="hp-statement-title">La apariencia no siempre alcanza.</h2>
+          <h2 id="hp-statement-title">
+            La apariencia inspira confianza. La evidencia ayuda a sostenerla.
+          </h2>
           <p>
-            Nombres conocidos, mensajes bien escritos y sitios cuidados pueden
-            inspirar confianza. Una duda a tiempo abre espacio para comprobar
-            antes de exponerte.
+            Un nombre conocido, un sitio cuidado o un mensaje bien escrito no
+            confirman por sí solos quién está detrás. A tiempo hace visible lo
+            que observas, lo que falta y lo que todavía conviene comprobar.
           </p>
         </section>
 
         <section
           className="hp-situations"
-          id="evaluar-prueba"
+          id="situaciones"
           aria-labelledby="hp-situations-title"
         >
-          <h2 id="hp-situations-title">Tres momentos para mirar de nuevo.</h2>
+          <div className="hp-section-heading">
+            <h2 id="hp-situations-title">
+              Hay momentos cotidianos que merecen una segunda mirada.
+            </h2>
+            <p>
+              No se trata de desconfiar de todo, sino de reconocer cuándo una
+              pausa puede darte mejor información.
+            </p>
+          </div>
 
           <div className="hp-situation-list">
-            {situations.map((situation, index) => (
-              <article className="hp-situation" key={situation.context}>
-                <span className="hp-situation-mark" aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
+            {situations.map(({ context, title, copy, icon: Icon }) => (
+              <article className="hp-situation" key={context}>
+                <span className="hp-situation-icon" aria-hidden="true">
+                  <Icon size={22} strokeWidth={1.7} />
                 </span>
                 <div className="hp-situation-copy">
-                  <h3>{situation.title}</h3>
-                  <p className="hp-situation-context">{situation.context}</p>
-                  <p>{situation.copy}</p>
+                  <h3>{title}</h3>
+                  <p>{copy}</p>
+                  <span>{context}</span>
                 </div>
               </article>
             ))}
@@ -172,14 +130,17 @@ export default function HomePrueba() {
 
         <section
           className="hp-method"
-          id="aprender-prueba"
+          id="como-funciona"
           aria-labelledby="hp-method-title"
         >
           <div className="hp-method-heading">
-            <h2 id="hp-method-title">Antes de actuar, verificá.</h2>
+            <h2 id="hp-method-title">
+              Una pausa breve puede convertir señales sueltas en próximos
+              pasos.
+            </h2>
             <p>
-              No se trata de desconfiar de todo. Se trata de contar con un
-              momento y criterios simples para decidir mejor.
+              El método mantiene la decisión en tus manos y agrega estructura
+              cuando la presión intenta quitártela.
             </p>
           </div>
 
@@ -187,10 +148,10 @@ export default function HomePrueba() {
             {method.map(({ title, copy, icon: Icon }, index) => (
               <li key={title}>
                 <span className="hp-method-icon" aria-hidden="true">
-                  <Icon size={22} strokeWidth={1.6} />
+                  <Icon size={21} strokeWidth={1.7} />
                 </span>
                 <span className="hp-method-index" aria-hidden="true">
-                  0{index + 1}
+                  {String(index + 1).padStart(2, "0")}
                 </span>
                 <h3>{title}</h3>
                 <p>{copy}</p>
@@ -200,16 +161,42 @@ export default function HomePrueba() {
         </section>
 
         <section className="hp-closing" aria-labelledby="hp-closing-title">
-          <h2 id="hp-closing-title">Una pausa también puede protegerte.</h2>
-          <p>
-            Aprendé a reconocer señales, contrastar la información y elegir tu
-            próximo paso con más contexto.
-          </p>
-          <Link className="hp-primary" to="/register">
-            Empezar ahora <ArrowUpRight aria-hidden="true" size={18} />
-          </Link>
+          <div>
+            <h2 id="hp-closing-title">Decide con más contexto.</h2>
+            <p>
+              Reúne lo que observas, identifica lo que falta y verifica antes
+              de realizar una acción difícil de revertir.
+            </p>
+          </div>
+          <MotionLink
+            className="hp-primary"
+            to="/register"
+            whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+          >
+            Empezar con A tiempo
+            <ArrowUpRight aria-hidden="true" size={18} />
+          </MotionLink>
         </section>
       </main>
+
+      <footer className="hp-footer">
+        <div>
+          <Link className="hp-wordmark" to="/home-prueba">
+            <span className="hp-wordmark-mark" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </span>
+            A tiempo
+          </Link>
+          <p>Contexto antes de actuar.</p>
+        </div>
+        <nav aria-label="Navegación del pie">
+          <a href="#situaciones">Situaciones</a>
+          <a href="#como-funciona">Cómo funciona</a>
+          <Link to="/login">Ingresar</Link>
+        </nav>
+      </footer>
     </div>
   );
 }

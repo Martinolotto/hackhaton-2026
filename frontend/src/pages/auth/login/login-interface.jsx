@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { handleLogin } from '@/components/services/handleLogin'
 import Nav from '../../../components/navegation/nav'
+import '../auth.css'
 
 const initialCredentials = {
   email: '',
@@ -49,7 +50,7 @@ function LoginInterface({ onAuthenticated }) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="auth-page">
       <Nav />
       <main className="flex min-h-[calc(100vh-57px)] items-center justify-center p-4 sm:p-8">
       <section

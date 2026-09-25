@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { handleRegister } from '@/components/services/registerHandler'
 import Nav from '../../components/navegation/nav'
+import './auth.css'
 
 const initialForm = {
   firstName: '',
@@ -74,7 +75,7 @@ function AuthInterface({ onRegistered }) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="auth-page">
       <Nav />
       <main className="min-h-[calc(100vh-57px)] p-4 sm:p-8 lg:flex lg:items-center lg:justify-center lg:p-12">
       <section
