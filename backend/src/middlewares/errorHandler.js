@@ -12,6 +12,14 @@ function normalizeError(error) {
     return new HttpError(413, "PAYLOAD_TOO_LARGE", "La solicitud supera el tamaño permitido.");
   }
 
+  if (["LIMIT_FILE_SIZE", "LIMIT_FIELD_VALUE"].includes(error?.code)) {
+    return new HttpError(413, "PAYLOAD_TOO_LARGE", "La solicitud supera el tamaño permitido.");
+  }
+
+  if (typeof error?.code === "string" && error.code.startsWith("LIMIT_")) {
+    return new HttpError(400, "INVALID_REQUEST", "La solicitud de evaluación no es válida.");
+  }
+
   if (error instanceof SyntaxError && "body" in error) {
     return new HttpError(400, "INVALID_REQUEST", "La solicitud de evaluación no es válida.");
   }

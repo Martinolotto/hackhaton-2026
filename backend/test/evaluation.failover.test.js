@@ -115,3 +115,25 @@ test("la respuesta obtenida por fallback conserva el schema contractual", async 
   const response = await evaluate(evaluationCases.free);
   assert.equal(evaluationResponseSchema.safeParse(response).success, true);
 });
+
+test("el failover reenvía intacta la misma entrada multimodal", async () => {
+  const inputs = [];
+  const evaluate = service(async (request) => {
+    inputs.push(request.input);
+    if (request.model === models.primary) {
+      throw Object.assign(new Error("unavailable"), { status: 503 });
+    }
+    return validInteraction();
+  });
+  const image = {
+    buffer: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
+    mimeType: "image/png",
+  };
+
+  const response = await evaluate(evaluationCases.free, image);
+
+  assert.equal(inputs.length, 2);
+  assert.strictEqual(inputs[0], inputs[1]);
+  assert.equal(inputs[0][1].mime_type, "image/png");
+  assert.equal(evaluationResponseSchema.safeParse(response).success, true);
+});

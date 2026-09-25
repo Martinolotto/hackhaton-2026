@@ -48,6 +48,10 @@ completa, comprensible y limitada, aunque no realice una verificación posterior
    riesgo, **cuando** se genera la evaluación, **entonces** el riesgo se expresa
    como `no determinable`, la incertidumbre se informa por separado y se explican
    los faltantes que limitan la conclusión.
+5. **Dado** que la persona dispone de una captura PNG, JPEG o WEBP de hasta 4 MB,
+   **cuando** la adjunta opcionalmente junto al contexto textual, **entonces** la
+   captura se usa como contexto adicional no verificado, no se persiste y la
+   respuesta conserva la misma estructura explicable.
 
 ---
 
@@ -136,6 +140,8 @@ explícito sin evaluación fabricada.
 - Si el contenido puede implicar un perjuicio inmediato, la orientación prioriza
   pausar la acción y acudir a un canal independiente u oficial, sin actuar ni
   decidir en nombre de la persona.
+- Si una captura declara un formato no permitido, su contenido no coincide con el
+  formato declarado o supera 4 MB, el recorrido la rechaza antes de evaluar.
 
 ## Requisitos *(obligatorio)*
 
@@ -203,6 +209,23 @@ explícito sin evaluación fabricada.
   aceptación, pero NO DEBEN restringir los tipos de entrada admitidos.
 - **RF-026**: El producto NO DEBE analizar automáticamente la URL aportada ni
   realizar verificaciones externas automáticas dentro de esta feature.
+- **RF-027**: La persona DEBE poder adjuntar opcionalmente una captura PNG, JPEG o
+  WEBP de hasta 4 MB sin eliminar ninguno de los campos contextuales existentes.
+- **RF-028**: La captura DEBE mantenerse solo en memoria durante el request y el
+  recorrido local; NO DEBE escribirse a disco, persistirse en Supabase ni originar
+  tablas, Storage, OCR propio, lectura EXIF o herramientas externas.
+- **RF-029**: Una captura válida DEBE enviarse a Gemini junto al texto como contexto
+  multimodal no verificado y NO DEBE presentarse como detector automático ni prueba
+  concluyente de fraude, autenticidad o seguridad.
+- **RF-030**: Cuando no exista captura, el transporte y evaluación textual vigentes
+  DEBEN conservar su comportamiento.
+- **RF-031**: La captura seleccionada DEBE poder previsualizarse, reemplazarse o
+  eliminarse antes del envío, mostrando nombre, tamaño y que no será almacenada.
+- **RF-032**: Si el recorrido alcanza la única reevaluación y la captura continúa
+  disponible en memoria, el frontend DEBE reenviar el mismo archivo; un refresh no
+  obliga a reconstruirlo ni recuperarlo.
+- **RF-033**: La respuesta HTTP, structured output, escalas, Auth, rate limit,
+  failover y límite de una reevaluación DEBEN permanecer sin cambios semánticos.
 
 ### Alcance explícito
 
@@ -212,8 +235,8 @@ aportada por la persona, una reevaluación y cierre con orientación humana.
 
 Quedan fuera del alcance actual: comunidad o C5, persistencia de casos, perfiles,
 historial, un dashboard nuevo, notificaciones, monitoreo, AnythingLLM,
-verificaciones externas automáticas, análisis automático de URL, imágenes o
-capturas como requisito, múltiples reevaluaciones y ampliaciones de autenticación.
+verificaciones externas automáticas, análisis automático de URL, imágenes como
+requisito obligatorio, múltiples reevaluaciones y ampliaciones de autenticación.
 
 ### Entidades clave
 
@@ -232,6 +255,8 @@ capturas como requisito, múltiples reevaluaciones y ampliaciones de autenticaci
   resolver aspectos del caso.
 - **Reevaluación**: Única actualización permitida de la evaluación inicial que
   incorpora el resultado aportado y explica el efecto de la nueva información.
+- **Captura opcional**: Archivo PNG, JPEG o WEBP de hasta 4 MB aportado como
+  contexto adicional no verificado y conservado únicamente en memoria.
 
 ## Criterios de éxito *(obligatorio)*
 
@@ -261,6 +286,9 @@ capturas como requisito, múltiples reevaluaciones y ampliaciones de autenticaci
 - **CE-008**: En una revisión de contenido de todas las salidas de aceptación no
   aparece ninguna certificación de seguridad, fuente no comprobada presentada como
   verificada, probabilidad ficticia ni equivalencia entre un indicador y una prueba.
+- **CE-009**: Las pruebas aceptan PNG, JPEG y WEBP válidos, rechazan formato o
+  tamaño inválido, conservan el flujo sin imagen y demuestran que una captura puede
+  reenviarse en la única reevaluación sin persistencia.
 
 ## Supuestos
 

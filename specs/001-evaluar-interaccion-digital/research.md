@@ -42,8 +42,9 @@ falla cerrado con 401 si el token no puede validarse.
 
 **Decisión**: usar `@google/genai` con Gemini Developer API mediante
 `ai.interactions.create(...)`, `store: false` y sin
-`previous_interaction_id`. El modelo se obtiene de `GEMINI_MODEL`; el valor inicial
-es `gemini-3.8-flash` después de comprobar acceso con la API key real.
+`previous_interaction_id`. Los modelos se obtienen de `GEMINI_MODEL` y
+`GEMINI_FALLBACK_MODEL`; cada uno se intenta como máximo una vez y el segundo solo
+se utiliza ante `503/UNAVAILABLE` o timeout.
 
 **Justificación**: Interactions es la interfaz actual recomendada para proyectos
 nuevos. `store: false` mantiene la operación stateless también del lado de esa API.
@@ -59,14 +60,13 @@ configuración controlada.
   reproducibilidad.
 - AnythingLLM: fuera del alcance y retirado del producto.
 
-**Comprobación operativa pendiente**: la documentación confirma la existencia de
-`gemini-3.8-flash`, no que la API key del proyecto tenga acceso. El preflight de
-implementación/despliegue debe comprobarlo sin registrar ni exponer la key.
+**Comprobación operativa pendiente**: el preflight de despliegue debe confirmar
+que la API key tiene acceso a ambos modelos configurados y que ambos aceptan la
+misma entrada multimodal, sin registrar ni exponer la key.
 
 **Fuentes oficiales**:
 
 - [Interactions API](https://ai.google.dev/gemini-api/docs/interactions-overview)
-- [Modelo Gemini 3.8 Flash](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-flash)
 - [Catálogo de modelos](https://ai.google.dev/gemini-api/docs/models)
 - [SDK oficial JavaScript](https://github.com/googleapis/js-genai)
 
@@ -191,11 +191,12 @@ cubren la vertical.
 **Alternativas consideradas**: Vitest/Testing Library y browser E2E automatizado
 son valiosos, pero no son necesarios para la vertical mínima y se difieren.
 
-## 9. Preparación no invasiva para imágenes
+## 9. Ampliación aprobada para captura opcional
 
-**Decisión**: mantener el adaptador del evaluador basado en un objeto de entrada
-extensible y separar construcción de prompt de transporte Gemini.
+**Decisión**: transportar un único PNG, JPEG o WEBP opcional de hasta 4 MB mediante
+multipart y Multer `memoryStorage`; enviar su base64 inline únicamente al input
+multimodal de Interactions.
 
-**Justificación**: una versión futura puede añadir partes multimodales sin cambiar
-la semántica textual existente. No se crean hoy uploads, multipart, Storage,
-tablas, validadores de archivos ni contratos de imagen.
+**Justificación**: conserva exactamente JSON y texto cuando no hay captura, valida
+MIME y firma, permite reenviar el mismo `File` en la reevaluación y evita Storage,
+tablas, filesystem, OCR, EXIF y herramientas externas.

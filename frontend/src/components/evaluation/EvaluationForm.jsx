@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { AlertTriangle, ArrowRight, CheckCircle2, LockKeyhole } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { AlertTriangle, ArrowRight, CheckCircle2, ImagePlus, LockKeyhole, Trash2 } from "lucide-react";
+
+const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg", "image/webp"]);
+const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
 
 const EMPTY_INTERACTION = {
   description: "",
@@ -21,10 +24,25 @@ const REQUIRED_FIELDS = [
   "doubtReason",
 ];
 
+function formatFileSize(bytes) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default function EvaluationForm({ onSubmit, disabled = false }) {
   const [interaction, setInteraction] = useState(EMPTY_INTERACTION);
+  const [image, setImage] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
   const [originUnknown, setOriginUnknown] = useState(false);
   const [validationMessage, setValidationMessage] = useState("");
+  const imageInputRef = useRef(null);
+  const previewUrlRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    };
+  }, []);
 
   const updateField = (event) => {
     const { name, value } = event.target;
@@ -48,12 +66,49 @@ export default function EvaluationForm({ onSubmit, disabled = false }) {
       return;
     }
 
-    onSubmit({
-      ...normalized,
-      url: normalized.url || null,
-      observableOrigin: originUnknown ? null : normalized.observableOrigin,
-    });
+    onSubmit(
+      {
+        ...normalized,
+        url: normalized.url || null,
+        observableOrigin: originUnknown ? null : normalized.observableOrigin,
+      },
+      image,
+    );
   };
+
+  const selectImage = (event) => {
+    const [nextImage] = event.target.files;
+    if (!nextImage) return;
+
+    if (!ALLOWED_IMAGE_TYPES.has(nextImage.type)) {
+      setValidationMessage("La captura debe estar en formato PNG, JPEG o WEBP.");
+      event.target.value = "";
+      return;
+    }
+
+    if (nextImage.size > MAX_IMAGE_BYTES) {
+      setValidationMessage("La captura no puede superar los 4 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = URL.createObjectURL(nextImage);
+    setPreviewUrl(previewUrlRef.current);
+    setImage(nextImage);
+    setValidationMessage("");
+  };
+
+  const removeImage = () => {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = null;
+    setPreviewUrl(null);
+    setImage(null);
+    setValidationMessage("");
+    if (imageInputRef.current) imageInputRef.current.value = "";
+  };
+
+  const formattedImageSize = image ? formatFileSize(image.size) : "";
 
   return (
     <form className="evaluation-form" onSubmit={handleSubmit} noValidate>
@@ -62,8 +117,8 @@ export default function EvaluationForm({ onSubmit, disabled = false }) {
         <div>
           <strong>Protege tu información.</strong>
           <p>
-            No ingreses contraseñas, códigos de verificación, datos bancarios ni otra
-            información sensible.
+            No ingreses contraseñas, códigos OTP o de verificación, datos bancarios
+            completos ni documentación sensible innecesaria, tampoco en la captura.
           </p>
         </div>
       </div>
@@ -110,6 +165,43 @@ export default function EvaluationForm({ onSubmit, disabled = false }) {
             Se usa como contexto declarado. No abrimos ni verificamos el enlace.
           </span>
         </label>
+
+        <div className="evaluation-image-input">
+          <div className="evaluation-image-heading">
+            <div>
+              <strong>Captura de la interacción</strong>
+              <span className="evaluation-optional">Opcional</span>
+            </div>
+            <p>PNG, JPEG o WEBP · máximo 4 MB. Se procesa en memoria y no se almacena.</p>
+          </div>
+
+          <label className="evaluation-file-picker" htmlFor="evaluation-image">
+            <ImagePlus aria-hidden="true" size={20} />
+            {image ? "Reemplazar captura" : "Seleccionar captura"}
+            <input
+              ref={imageInputRef}
+              id="evaluation-image"
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={selectImage}
+              disabled={disabled}
+            />
+          </label>
+
+          {image && (
+            <div className="evaluation-image-preview">
+              <img src={previewUrl ?? ""} alt={`Vista previa de ${image.name}`} />
+              <div>
+                <strong>{image.name}</strong>
+                <span>{formattedImageSize}</span>
+                <small>La captura se volverá a enviar solo si realizas la reevaluación.</small>
+              </div>
+              <button type="button" onClick={removeImage} disabled={disabled}>
+                <Trash2 aria-hidden="true" size={17} /> Eliminar
+              </button>
+            </div>
+          )}
+        </div>
       </fieldset>
 
       <fieldset disabled={disabled}>

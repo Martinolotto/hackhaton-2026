@@ -31,6 +31,16 @@ El objeto es estricto: no admite propiedades adicionales. Los límites mantienen
 request dentro del body máximo de 32 KiB y reducen abuso accidental sin restringir
 el texto libre a fixtures.
 
+## Captura opcional
+
+| Campo interno | Tipo | Regla |
+| --- | --- | --- |
+| `buffer` | Buffer en memoria | Opcional, máximo 4 MB; nunca se escribe a disco. |
+| `mimeType` | enum | `image/png`, `image/jpeg` o `image/webp`, coherente con la firma binaria. |
+
+La captura viaja como parte `image` solo en multipart. No se agrega al objeto
+`interaction`, no aparece en la respuesta y no posee id, URL persistente ni ruta.
+
 ## Resultado de verificación
 
 | Campo | Tipo | Regla de validación |
@@ -49,7 +59,8 @@ la reevaluación. No se admite una lista de resultados.
 | `verificationResult` | Resultado de verificación o null | Obligatorio como propiedad; determina la fase solicitada. |
 
 No contiene `caseId`, `evaluationId`, user id ni modelo. La identidad proviene del
-token, nunca del body.
+token, nunca del body. El mismo objeto usa JSON cuando no hay captura; con captura
+se serializa en el campo multipart `evaluation` y el archivo viaja por separado.
 
 ## Evaluación
 
@@ -140,7 +151,8 @@ Transiciones de error:
 - después de `evaluated_final` no existe transición a otra reevaluación.
 
 El refresh o salida de la página descarta todo el estado. No hay restauración ni
-historial.
+historial. Si existe una captura, el mismo `File` se conserva solo en este estado
+para reenviarlo durante la única reevaluación.
 
 ## Reglas transversales
 
@@ -149,4 +161,4 @@ historial.
 3. La URL nunca cambia de texto a recurso recuperado.
 4. La respuesta no contiene probabilidad, porcentaje ni confianza numérica.
 5. Error y evaluación son mutuamente excluyentes.
-6. Request, respuesta y user id no se escriben en almacenamiento de aplicación.
+6. Request, respuesta, user id y captura no se escriben en almacenamiento de aplicación.

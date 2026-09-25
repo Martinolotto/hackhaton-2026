@@ -24,10 +24,12 @@ SUPABASE_URL
 SUPABASE_PUBLISHABLE_KEY
 GEMINI_API_KEY
 GEMINI_MODEL
+GEMINI_FALLBACK_MODEL
 ```
 
-Valor inicial propuesto de `GEMINI_MODEL`: `gemini-3.8-flash`. Confirmar que la
-API key real tiene acceso antes de la demo; no implementar fallback silencioso.
+Confirmar antes de la demo que la API key tiene acceso a ambos modelos configurados
+y que ambos admiten la misma entrada multimodal. El failover está limitado a un
+segundo intento ante `503/UNAVAILABLE` o timeout.
 
 Frontend, únicamente en `frontend/.env` local y Vercel:
 
@@ -57,6 +59,8 @@ Resultados esperados:
 - timeout, cuota o respuesta mock inválida terminan en 503;
 - el límite por `userId` termina en 429;
 - ninguna prueba requiere base de datos.
+- PNG, JPEG y WEBP válidos se aceptan; formato o tamaño inválido se rechaza;
+- el failover conserva la misma entrada multimodal y ninguna captura se persiste.
 
 ```bash
 cd ../frontend
@@ -140,6 +144,13 @@ Resultado esperado:
   sistema;
 - el frontend no presenta otra acción de reevaluación después del éxito.
 
+### Captura opcional
+
+Seleccionar una captura PNG, JPEG o WEBP menor o igual a 4 MB y comprobar preview,
+nombre, tamaño, reemplazo y eliminación. Con captura, el request usa multipart con
+`evaluation` e `image`; sin captura conserva JSON. La reevaluación reenvía el mismo
+archivo mientras la página siga abierta. Refrescar descarta el archivo local.
+
 ## 6. Fixtures de aceptación
 
 Ejecutar los tres casos definidos en
@@ -171,6 +182,8 @@ Validar de forma determinística con doubles/mocks de integración:
 | JSON/campos inválidos | `400 INVALID_REQUEST` |
 | Token ausente, inválido o expirado | `401 UNAUTHORIZED` |
 | Body mayor a 32 KiB | `413 PAYLOAD_TOO_LARGE` |
+| Captura no permitida o firma incompatible | `400 INVALID_REQUEST` |
+| Captura mayor a 4 MB | `413 PAYLOAD_TOO_LARGE` |
 | Más de diez requests/15 min para el mismo usuario | `429 RATE_LIMITED` y `Retry-After` |
 | Timeout, cuota o red Gemini | `503 EVALUATION_UNAVAILABLE` |
 | JSON Gemini no parseable o salida que no cumple Zod | `503 EVALUATION_UNAVAILABLE` |
@@ -183,7 +196,7 @@ En todos los fallos, comprobar que no aparece una evaluación total ni parcial.
 - Confirmar que el request y response no contienen `caseId` ni `evaluationId`.
 - Reiniciar backend/frontend: ningún caso debe reaparecer.
 - Revisar que no existan writes a Supabase Database, filesystem o store externo.
-- Revisar que logs no incluyan body, token, prompt ni respuesta completa.
+- Revisar que logs no incluyan body, imagen/base64, token, prompt ni respuesta completa.
 
 ## 10. Revisión previa a producción
 

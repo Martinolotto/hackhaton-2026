@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Contrato de evaluación de interacciones digitales
-  version: 1.0.0
+  version: 1.1.0
   description: >-
     Contrato compartido y stateless para evaluación inicial y una reevaluación.
     El proveedor de evaluación es un detalle privado del backend.
@@ -56,6 +56,12 @@ paths:
                   verificationResult:
                     verificationPerformed: Consulté la aplicación oficial sin usar el enlace.
                     observedResult: No apareció ninguna alerta en la cuenta.
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MultimodalEvaluationRequest"
+            encoding:
+              image:
+                contentType: image/png, image/jpeg, image/webp
       responses:
         "200":
           description: Evaluación completa y validada.
@@ -137,6 +143,20 @@ components:
       bearerFormat: JWT
       description: Access token de la sesión Supabase.
   schemas:
+    MultimodalEvaluationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - evaluation
+      properties:
+        evaluation:
+          type: string
+          contentMediaType: application/json
+          description: Serialización JSON completa de EvaluationRequest.
+        image:
+          type: string
+          format: binary
+          description: Captura opcional PNG, JPEG o WEBP de hasta 4 MB; no se persiste.
     EvaluationRequest:
       type: object
       additionalProperties: false

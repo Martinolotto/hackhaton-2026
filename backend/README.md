@@ -22,7 +22,12 @@ Endpoints:
 
 - `GET /api/health`: disponibilidad del servicio.
 - `POST /api/evaluations`: evaluación inicial o reevaluación stateless; requiere
-  `Authorization: Bearer <Supabase access token>`.
+  `Authorization: Bearer <Supabase access token>`. Acepta el JSON existente o
+  multipart con `evaluation` (JSON serializado) e `image` opcional.
+
+La captura opcional admite PNG, JPEG o WEBP de hasta 4 MB. Multer la conserva
+únicamente en memoria; no se escribe a disco, no se persiste y se envía a Gemini
+como un bloque multimodal junto al contexto textual.
 
 ## Variables de entorno
 

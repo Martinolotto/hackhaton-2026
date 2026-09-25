@@ -28,6 +28,11 @@ Cliente React/Vite del recorrido de evaluación guiada de interacciones digitale
 La landing, `/login` y `/register` son públicas. `/evaluar` requiere una sesión
 Supabase válida y envía `session.access_token` como Bearer token.
 
+El formulario admite una captura PNG, JPEG o WEBP opcional de hasta 4 MB. Sin
+captura conserva el request JSON; con captura usa multipart. El archivo se mantiene
+solo durante el recorrido local para permitir la única reevaluación y se pierde al
+refrescar la página.
+
 ## Fixture visual de desarrollo
 
 Si el backend todavía no está disponible, inicia sesión y abre:
