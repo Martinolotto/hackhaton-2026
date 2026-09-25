@@ -7,6 +7,44 @@ import { useReducedMotion } from 'framer-motion';
 
 gsap.registerPlugin(ScrollTrigger, GSAPSplitText, useGSAP);
 
+const splitTextQueue = [];
+let activeSplitTextItem = null;
+const SPLIT_TEXT_CASCADE_GAP = 0.22;
+
+const runNextSplitText = () => {
+  if (activeSplitTextItem) return;
+
+  const nextItem = splitTextQueue.shift();
+  if (!nextItem) return;
+  if (nextItem.cancelled) {
+    runNextSplitText();
+    return;
+  }
+
+  activeSplitTextItem = nextItem;
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    if (activeSplitTextItem === nextItem) activeSplitTextItem = null;
+    runNextSplitText();
+  };
+
+  nextItem.finish = finish;
+  nextItem.run(finish);
+};
+
+const enqueueSplitText = run => {
+  const item = { run, finish: null, cancelled: false };
+  splitTextQueue.push(item);
+  runNextSplitText();
+
+  return () => {
+    item.cancelled = true;
+    if (activeSplitTextItem === item) item.finish?.();
+  };
+};
+
 const SplitText = ({
   text,
   className = '',
@@ -18,6 +56,8 @@ const SplitText = ({
   splitBy,
   from = { opacity: 0, y: 40 },
   to = { opacity: 1, y: 0 },
+  animationFrom,
+  animationTo,
   threshold = 0.1,
   rootMargin = '-100px',
   textAlign,
@@ -30,8 +70,12 @@ const SplitText = ({
   const onCompleteRef = useRef(onLetterAnimationComplete);
   const [fontsLoaded, setFontsLoaded] = useState(() => document.fonts?.status === 'loaded');
   const shouldReduceMotion = useReducedMotion();
-  const resolvedEase = easing ?? ease ?? 'elastic.out';
+  const easingAliases = { easeOutCubic: 'power3.out' };
+  const requestedEase = easing ?? ease ?? 'elastic.out';
+  const resolvedEase = easingAliases[requestedEase] ?? requestedEase;
   const resolvedSplitType = splitBy ?? splitType;
+  const resolvedFrom = animationFrom ?? from;
+  const resolvedTo = animationTo ?? to;
 
   // Keep callback ref updated
   useEffect(() => {
@@ -78,6 +122,11 @@ const SplitText = ({
       const start = `top ${startPct}%${sign}`;
 
       let targets;
+      let tween;
+      let sequenceAdvance;
+      let sequenceCleanup;
+      let sequenceTrigger;
+      let destroyed = false;
       const assignTargets = self => {
         if (resolvedSplitType.includes('chars') && self.chars.length) targets = self.chars;
         if (!targets && resolvedSplitType.includes('words') && self.words.length) targets = self.words;
@@ -95,36 +144,50 @@ const SplitText = ({
         reduceWhiteSpace: false,
         onSplit: self => {
           assignTargets(self);
-          const tween = gsap.fromTo(
-            targets,
-            { ...from },
-            {
-              ...to,
-              duration,
-              ease: resolvedEase,
-              stagger: delay / 1000,
-              scrollTrigger: {
-                trigger: el,
-                start,
-                once: true,
-                fastScrollEnd: true,
-                anticipatePin: 0.4
-              },
-              onComplete: () => {
-                animationCompletedRef.current = true;
-                onCompleteRef.current?.();
-              },
-              willChange: 'transform, opacity',
-              force3D: true
+          gsap.set(targets, { ...resolvedFrom });
+
+          sequenceTrigger = ScrollTrigger.create({
+            trigger: el,
+            start,
+            once: true,
+            fastScrollEnd: true,
+            anticipatePin: 0.4,
+            onEnter: () => {
+              sequenceCleanup = enqueueSplitText(finishSequence => {
+                if (destroyed) {
+                  finishSequence();
+                  return;
+                }
+
+                tween = gsap.to(targets, {
+                  ...resolvedTo,
+                  duration,
+                  ease: resolvedEase,
+                  stagger: delay / 1000,
+                  onComplete: () => {
+                    animationCompletedRef.current = true;
+                    onCompleteRef.current?.();
+                  },
+                  willChange: 'transform, opacity',
+                  force3D: true
+                });
+                sequenceAdvance = gsap.delayedCall(SPLIT_TEXT_CASCADE_GAP, finishSequence);
+              });
             }
-          );
-          return tween;
+          });
+
+          return undefined;
         }
       });
 
       el._rbsplitInstance = splitInstance;
 
       return () => {
+        destroyed = true;
+        sequenceAdvance?.kill();
+        sequenceCleanup?.();
+        sequenceTrigger?.kill();
+        tween?.kill();
         ScrollTrigger.getAll().forEach(st => {
           if (st.trigger === el) st.kill();
         });
@@ -143,8 +206,8 @@ const SplitText = ({
         duration,
         resolvedEase,
         resolvedSplitType,
-        JSON.stringify(from),
-        JSON.stringify(to),
+        JSON.stringify(resolvedFrom),
+        JSON.stringify(resolvedTo),
         threshold,
         rootMargin,
         fontsLoaded,

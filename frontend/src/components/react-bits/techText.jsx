@@ -36,11 +36,13 @@ const signed = value => (value > 0 ? `+${value}` : value < 0 ? `−${-value}` : 
 
 const TechText = ({
   text = 'React Bits',
+  font,
   fontFamily = '',
   fontWeight = 600,
   fontSize = 150,
   letterSpacing = -0.05,
   color = '#ffffff',
+  accent,
   accentColor = '#ffffff',
   reach = 200,
   softness = 0.7,
@@ -62,16 +64,22 @@ const TechText = ({
   const canvasRef = useRef(null);
   const settingsRef = useRef(null);
   const wakeRef = useRef(() => {});
+  const resolvedFontFamily = font === 'inherit' ? '' : (font ?? fontFamily);
+  const parsedFontSize = Number.parseFloat(fontSize);
+  const parsedLetterSpacing = Number.parseFloat(letterSpacing);
+  const resolvedFontSize = Number.isFinite(parsedFontSize) ? parsedFontSize : 150;
+  const resolvedLetterSpacing = Number.isFinite(parsedLetterSpacing) ? parsedLetterSpacing : -0.05;
+  const resolvedAccentColor = accent ?? accentColor;
 
   useEffect(() => {
     settingsRef.current = {
       text,
-      fontFamily,
+      fontFamily: resolvedFontFamily,
       fontWeight,
-      fontSize,
-      letterSpacing,
+      fontSize: resolvedFontSize,
+      letterSpacing: resolvedLetterSpacing,
       color,
-      accentColor,
+      accentColor: resolvedAccentColor,
       reach,
       softness,
       dashLength,
@@ -191,58 +199,101 @@ const TechText = ({
       }
 
       const probe = scratchCtx;
-      setFont(probe, s, s.fontSize);
-      let m = probe.measureText(s.text);
-      const fit = Math.min(
-        1,
-        (width * 0.9) / Math.max(m.actualBoundingBoxLeft + m.actualBoundingBoxRight, 1),
-        (height * 0.66) / Math.max(m.actualBoundingBoxAscent + m.actualBoundingBoxDescent, 1)
-      );
-      const size = s.fontSize * fit;
-      setFont(probe, s, size);
-      m = probe.measureText(s.text);
-      const inkWidth = m.actualBoundingBoxLeft + m.actualBoundingBoxRight;
-      const inkHeight = m.actualBoundingBoxAscent + m.actualBoundingBoxDescent;
-      const x = (width - inkWidth) / 2 + m.actualBoundingBoxLeft;
-      const baseline = (height - inkHeight) / 2 + m.actualBoundingBoxAscent;
+      const maxWidth = width * 0.9;
+      const maxHeight = height * 0.66;
+      const maxLines = 3;
+
+      const wrapAtSize = size => {
+        setFont(probe, s, size);
+        const words = String(s.text).trim().split(/\s+/);
+        const lines = [];
+        let current = '';
+        for (const part of words) {
+          const candidate = current ? `${current} ${part}` : part;
+          if (current && probe.measureText(candidate).width > maxWidth) {
+            lines.push(current);
+            current = part;
+          } else {
+            current = candidate;
+          }
+        }
+        if (current) lines.push(current);
+        return lines;
+      };
+
+      let low = Math.min(16, s.fontSize);
+      let high = s.fontSize;
+      let size = low;
+      for (let step = 0; step < 12; step++) {
+        const candidate = (low + high) / 2;
+        const candidateLines = wrapAtSize(candidate);
+        const fits = candidateLines.length <= maxLines && candidateLines.length * candidate * 1.08 <= maxHeight;
+        if (fits) {
+          size = candidate;
+          low = candidate;
+        } else {
+          high = candidate;
+        }
+      }
+
+      const lines = wrapAtSize(size);
+      const lineHeight = size * 1.08;
+      const blockTop = (height - lines.length * lineHeight) / 2;
+      const lineLayouts = lines.map((line, lineIndex) => {
+        const metrics = probe.measureText(line);
+        const inkWidth = metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight;
+        const inkHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+        const x = (width - inkWidth) / 2 + metrics.actualBoundingBoxLeft;
+        const baseline = blockTop + lineIndex * lineHeight + (lineHeight - inkHeight) / 2 + metrics.actualBoundingBoxAscent;
+        return { text: line, metrics, inkWidth, inkHeight, x, baseline };
+      });
+
+      const left = Math.min(...lineLayouts.map(line => line.x - line.metrics.actualBoundingBoxLeft));
+      const right = Math.max(...lineLayouts.map(line => line.x + line.metrics.actualBoundingBoxRight));
+      const top = Math.min(...lineLayouts.map(line => line.baseline - line.metrics.actualBoundingBoxAscent));
+      const bottom = Math.max(...lineLayouts.map(line => line.baseline + line.metrics.actualBoundingBoxDescent));
       const next = {
         size,
-        baseline,
-        left: x - m.actualBoundingBoxLeft,
-        right: x + m.actualBoundingBoxRight,
-        top: baseline - m.actualBoundingBoxAscent,
-        bottom: baseline + m.actualBoundingBoxDescent
+        baseline: lineLayouts[0].baseline,
+        left,
+        right,
+        top,
+        bottom
       };
       word = next;
 
-      const chars = Array.from(s.text);
       const previous = glyphs;
       glyphs = [];
-      let prefix = '';
-      chars.forEach((char, i) => {
-        prefix += char;
-        const own = probe.measureText(char);
-        const gx = x + probe.measureText(prefix).width - own.width;
-        if (!char.trim()) return;
-        const base = {
-          char,
-          x: gx,
-          box: {
-            x1: gx - own.actualBoundingBoxLeft,
-            y1: baseline - own.actualBoundingBoxAscent,
-            x2: gx + own.actualBoundingBoxRight,
-            y2: baseline + own.actualBoundingBoxDescent
-          }
-        };
-        const kept = previous[glyphs.length];
-        glyphs.push({
-          ...base,
-          offset: kept?.char === char ? kept.offset : { x: 0, y: 0 },
-          velocity: { x: 0, y: 0 },
-          outline: 0,
-          index: i,
-          fill: sprite(s, next, base, false),
-          dashes: sprite(s, next, base, true)
+      let characterIndex = 0;
+      lineLayouts.forEach(line => {
+        let prefix = '';
+        Array.from(line.text).forEach(char => {
+          prefix += char;
+          const own = probe.measureText(char);
+          const gx = line.x + probe.measureText(prefix).width - own.width;
+          const index = characterIndex++;
+          if (!char.trim()) return;
+          const base = {
+            char,
+            x: gx,
+            box: {
+              x1: gx - own.actualBoundingBoxLeft,
+              y1: line.baseline - own.actualBoundingBoxAscent,
+              x2: gx + own.actualBoundingBoxRight,
+              y2: line.baseline + own.actualBoundingBoxDescent
+            }
+          };
+          const kept = previous[glyphs.length];
+          const lineView = { ...next, baseline: line.baseline };
+          glyphs.push({
+            ...base,
+            offset: kept?.char === char ? kept.offset : { x: 0, y: 0 },
+            velocity: { x: 0, y: 0 },
+            outline: 0,
+            index,
+            fill: sprite(s, lineView, base, false),
+            dashes: sprite(s, lineView, base, true)
+          });
         });
       });
       dragging = -1;
@@ -257,7 +308,11 @@ const TechText = ({
       glyphs.forEach((glyph, i) => {
         const x1 = glyph.box.x1 + glyph.offset.x;
         const x2 = glyph.box.x2 + glyph.offset.x;
-        const d = x < x1 ? x1 - x : x > x2 ? x - x2 : 0;
+        const y1 = glyph.box.y1 + glyph.offset.y;
+        const y2 = glyph.box.y2 + glyph.offset.y;
+        const dx = x < x1 ? x1 - x : x > x2 ? x - x2 : 0;
+        const dy = y < y1 ? y1 - y : y > y2 ? y - y2 : 0;
+        const d = Math.hypot(dx, dy);
         if (d < bestDistance) {
           bestDistance = d;
           best = i;

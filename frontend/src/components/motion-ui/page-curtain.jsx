@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigationType } from "react-router";
+import { BlurFade } from "../ui/blur-fade";
 import "./page-curtain.css";
 
 const pageTitles = {
@@ -52,10 +53,6 @@ export function PageCurtainStage({ children }) {
     return () => window.clearTimeout(focusTimer);
   }, [location.key, location.pathname, navigationType, routeKey, shouldReduceMotion]);
 
-  const contentTransition = shouldReduceMotion
-    ? { duration: 0.12, ease: "easeOut" }
-    : { duration: 0.24, delay: 0.17, ease: [0.16, 1, 0.3, 1] };
-
   return (
     <>
       <p className="page-curtain-announcer" aria-atomic="true" aria-live="polite">
@@ -63,16 +60,17 @@ export function PageCurtainStage({ children }) {
       </p>
 
       <AnimatePresence initial={false} mode="wait">
-        <motion.div
+        <BlurFade
           key={routeKey}
           className="page-curtain-content"
-          initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: shouldReduceMotion ? 0 : -5 }}
-          transition={contentTransition}
+          duration={0.32}
+          delay={0.12}
+          offset={8}
+          direction="up"
+          blur="8px"
         >
           {children}
-        </motion.div>
+        </BlurFade>
       </AnimatePresence>
 
       <AnimatePresence initial={false}>

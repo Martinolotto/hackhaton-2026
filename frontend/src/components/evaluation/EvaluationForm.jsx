@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AlertTriangle, ArrowRight, LockKeyhole } from "lucide-react";
+import { AlertTriangle, ArrowRight, CheckCircle2, LockKeyhole } from "lucide-react";
 
 const EMPTY_INTERACTION = {
   description: "",
@@ -69,7 +69,13 @@ export default function EvaluationForm({ onSubmit, disabled = false }) {
       </div>
 
       <fieldset disabled={disabled}>
-        <legend>Describe la interacción</legend>
+        <legend>
+          <span className="evaluation-step-number">01</span>
+          <span className="evaluation-step-copy">
+            <strong>Describe la interacción</strong>
+            <small>Cuéntanos qué ocurrió y comparte solo el contexto necesario.</small>
+          </span>
+        </legend>
         <label className="at-label" htmlFor="evaluation-description">
           ¿Qué ocurrió? <span aria-hidden="true">*</span>
           <textarea
@@ -107,7 +113,13 @@ export default function EvaluationForm({ onSubmit, disabled = false }) {
       </fieldset>
 
       <fieldset disabled={disabled}>
-        <legend>Agrega contexto</legend>
+        <legend>
+          <span className="evaluation-step-number">02</span>
+          <span className="evaluation-step-copy">
+            <strong>Agrega contexto</strong>
+            <small>Ayúdanos a entender quién te contactó y qué intentaba conseguir.</small>
+          </span>
+        </legend>
         <div className="evaluation-field-grid">
           <label className="at-label" htmlFor="evaluation-channel">
             Canal <span aria-hidden="true">*</span>
@@ -218,7 +230,7 @@ export default function EvaluationForm({ onSubmit, disabled = false }) {
       )}
 
       <div className="evaluation-submit-row">
-        <p>Los campos marcados con * son obligatorios.</p>
+        <p><CheckCircle2 aria-hidden="true" size={16} /> Los campos marcados con * son obligatorios.</p>
         <button className="at-button" type="submit" disabled={disabled}>
           {disabled ? "Evaluando interacción…" : "Evaluar interacción"}
           {!disabled && <ArrowRight aria-hidden="true" size={18} />}

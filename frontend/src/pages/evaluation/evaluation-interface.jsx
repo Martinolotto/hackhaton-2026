@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { AlertTriangle, ArrowLeft, RotateCcw, ShieldCheck } from "lucide-react";
+import { AlertTriangle, ArrowLeft, BadgeCheck, CircleHelp, LockKeyhole, RotateCcw, ShieldCheck } from "lucide-react";
 import { Link, useLocation } from "react-router";
 import Nav from "../../components/navegation/nav";
 import EvaluationForm from "../../components/evaluation/EvaluationForm";
@@ -221,79 +221,66 @@ export default function EvaluationInterface() {
   };
 
   return (
-    <div className="at-page evaluation-page">
+    <div className={`at-page evaluation-page ${!initialEvaluation ? "evaluation-page-entry" : ""}`}>
       <a className="evaluation-skip-link" href="#contenido-evaluacion">Ir al contenido principal</a>
       <Nav />
       <main className="at-main" id="contenido-evaluacion" tabIndex="-1">
-        <header className="at-intro evaluation-intro">
-          <div>
-            <p className="evaluation-eyebrow">Evaluación guiada</p>
-            <h1>Analiza una interacción antes de actuar.</h1>
-            <p>
-              Ordena lo que observaste, distingue señales de evidencia y encuentra una
-              verificación independiente. La decisión final siempre es tuya.
-            </p>
-          </div>
-          <span className="at-status">
-            {status === "editing" || status === "submitting_initial"
-              ? "Ingreso"
-              : status === "evaluated_final"
-                ? "Recorrido completo"
-                : "Resultado y verificación"}
-          </span>
-        </header>
-
-        {fixtureMode && (
-          <div className="evaluation-fixture-banner" role="status">
-            Modo fixture local activo. No se enviarán datos a la API.
-          </div>
-        )}
-
-        {requestError && (
-          <section className="evaluation-error" role="alert" aria-labelledby="evaluation-error-title">
-            <AlertTriangle aria-hidden="true" size={22} />
-            <div>
-              <h2 id="evaluation-error-title">No pudimos completar la solicitud</h2>
-              <p>{requestError.message}</p>
-              {requestError.status === 401 && (
-                <Link to="/login" state={{ from: location }}>Volver a iniciar sesión</Link>
-              )}
-            </div>
-          </section>
-        )}
-
         {!initialEvaluation ? (
-          <div className="analysis-layout">
-            <section className="at-panel" aria-labelledby="evaluation-form-title">
-              <header className="at-panel-header">
-                <h2 id="evaluation-form-title">Cuéntanos qué sucedió</h2>
-                <p>Incluye solo el contexto necesario. Los datos se usarán para esta evaluación.</p>
+          <div className="evaluation-entry-layout">
+            <aside className="evaluation-entry-aside">
+              <span className="evaluation-safe-badge"><span /> Análisis seguro</span>
+              <h1>Detecta señales de riesgo <em>antes de actuar.</em></h1>
+              <p className="evaluation-entry-lead">
+                Analiza mensajes, enlaces, perfiles y otras interacciones sospechosas antes de tomar una decisión.
+              </p>
+              <div className="evaluation-feature-list">
+                <div><span><BadgeCheck aria-hidden="true" size={21} /></span><p><strong>Análisis contextual</strong><small>Revisamos distintas señales de la interacción.</small></p></div>
+                <div><span><LockKeyhole aria-hidden="true" size={21} /></span><p><strong>Privacidad primero</strong><small>No solicites ni compartas información sensible.</small></p></div>
+                <div><span><CircleHelp aria-hidden="true" size={21} /></span><p><strong>Resultados explicables</strong><small>Comprende la evidencia, los límites y los próximos pasos.</small></p></div>
+              </div>
+              <div className="evaluation-shield-art" aria-hidden="true"><ShieldCheck size={86} strokeWidth={1.25} /></div>
+            </aside>
+
+            <section className="at-panel evaluation-entry-form" aria-labelledby="evaluation-form-title">
+              <header className="at-panel-header evaluation-entry-form-header">
+                <div>
+                  <p>Evaluación guiada</p>
+                  <h2 id="evaluation-form-title">Cuéntanos qué sucedió</h2>
+                </div>
+                <span className="at-status">Ingreso</span>
               </header>
               <div className="at-panel-body">
+                {fixtureMode && (
+                  <div className="evaluation-fixture-banner" role="status">
+                    Modo fixture local activo. No se enviarán datos a la API.
+                  </div>
+                )}
+                {requestError && (
+                  <section className="evaluation-error" role="alert" aria-labelledby="evaluation-error-title">
+                    <AlertTriangle aria-hidden="true" size={22} />
+                    <div>
+                      <h2 id="evaluation-error-title">No pudimos completar la solicitud</h2>
+                      <p>{requestError.message}</p>
+                      {requestError.status === 401 && <Link to="/login" state={{ from: location }}>Volver a iniciar sesión</Link>}
+                    </div>
+                  </section>
+                )}
                 <EvaluationForm onSubmit={handleInitialSubmit} disabled={isSubmitting} />
               </div>
             </section>
-
-            <aside className="analysis-aside">
-              <section className="at-panel" aria-labelledby="journey-title">
-                <header className="at-panel-header"><h2 id="journey-title">Tu recorrido</h2></header>
-                <div className="at-panel-body">
-                  <ol className="analysis-step-list">
-                    <li className="is-active"><span>1</span><div><strong>Describe</strong><small>Interacción y contexto</small></div></li>
-                    <li><span>2</span><div><strong>Comprende</strong><small>Riesgo e incertidumbre</small></div></li>
-                    <li><span>3</span><div><strong>Verifica</strong><small>Una comprobación independiente</small></div></li>
-                    <li><span>4</span><div><strong>Reevalúa</strong><small>Compara una sola vez</small></div></li>
-                  </ol>
-                </div>
-              </section>
-              <div className="at-note">
-                <ShieldCheck aria-hidden="true" size={20} />
-                <p>Una señal aislada no define una interacción. El resultado explica evidencia, contradicciones, faltantes y límites.</p>
-              </div>
-            </aside>
           </div>
         ) : (
-          <div className="evaluation-results-flow" ref={resultRef} tabIndex="-1">
+          <>
+            <header className="at-intro evaluation-intro">
+              <div><p className="evaluation-eyebrow">Evaluación guiada</p><h1>Resultado de la interacción.</h1><p>Revisa la evidencia, la incertidumbre y las verificaciones recomendadas antes de actuar.</p></div>
+              <span className="at-status">{status === "evaluated_final" ? "Recorrido completo" : "Resultado y verificación"}</span>
+            </header>
+            {requestError && (
+              <section className="evaluation-error" role="alert" aria-labelledby="evaluation-error-title">
+                <AlertTriangle aria-hidden="true" size={22} /><div><h2 id="evaluation-error-title">No pudimos completar la solicitud</h2><p>{requestError.message}</p></div>
+              </section>
+            )}
+            <div className="evaluation-results-flow" ref={resultRef} tabIndex="-1">
             <InteractionRecap interaction={interaction} />
 
             {reevaluation && (
@@ -337,7 +324,8 @@ export default function EvaluationInterface() {
                 <ArrowLeft aria-hidden="true" size={17} /> Descartar y empezar de nuevo
               </button>
             )}
-          </div>
+            </div>
+          </>
         )}
       </main>
     </div>

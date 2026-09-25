@@ -5,14 +5,15 @@ import {
   MessageSquareText,
   Pause,
   Search,
+  ShieldCheck,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import Nav from "../../components/navegation/nav";
+import HeroImageCarousel from "../../components/home/HeroImageCarousel";
 import { useAuth } from "../../context/auth";
 import "./homePrueba.css";
 
-import TechText from "@/components/react-bits/techText";
 import SplitText from "@/components/react-bits/textAparicionAnimations/SplitText";
 
 const MotionLink = motion.create(Link);
@@ -71,14 +72,43 @@ export default function HomePrueba() {
       <main id="contenido-home-prueba" tabIndex="-1">
         <section className="hp-tech-text-hero" aria-label="Mensaje principal">
           <div className="hp-tech-text-frame">
-            <TechText
-              text="Si algo te apura, no decidas todavía."
-              color="#000000"
-              accentColor="#000000"
-              fontWeight={700}
-              fontSize={120}
-              className="hp-tech-text"
-            />
+            <HeroImageCarousel />
+            <div className="hp-hero-content">
+              <div className="hp-hero-copy">
+                <div className="hp-hero-badge">
+                  <ShieldCheck size={17} aria-hidden="true" />
+                  Seguridad digital
+                </div>
+
+                <h1>
+                  Reconocé amenazas
+                  <br />
+                  digitales a tiempo
+                </h1>
+
+                <p>
+                  Aprendé a detectar fraudes, enlaces sospechosos y riesgos
+                  digitales antes de que puedan comprometer tu información.
+                </p>
+
+                <div className="hp-hero-actions">
+                  <MotionLink
+                    className="hp-hero-action hp-hero-action-primary"
+                    to="/aprendizaje"
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+                  >
+                    Comenzar aprendizaje
+                  </MotionLink>
+                  <MotionLink
+                    className="hp-hero-action hp-hero-action-secondary"
+                    to="/evaluar"
+                    whileTap={shouldReduceMotion ? undefined : { scale: 0.98 }}
+                  >
+                    Evaluar una interacción
+                  </MotionLink>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
