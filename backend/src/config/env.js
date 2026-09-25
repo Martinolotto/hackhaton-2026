@@ -31,13 +31,24 @@ export const env = {
   get geminiModel() {
     return required("GEMINI_MODEL");
   },
+  get geminiFallbackModel() {
+    return required("GEMINI_FALLBACK_MODEL");
+  },
 };
 
 export function validateEvaluationEnvironment() {
+  const geminiModel = env.geminiModel;
+  const geminiFallbackModel = env.geminiFallbackModel;
+
+  if (geminiModel === geminiFallbackModel) {
+    throw new Error("GEMINI_FALLBACK_MODEL debe ser distinto de GEMINI_MODEL");
+  }
+
   return {
     supabaseUrl: env.supabaseUrl,
     supabasePublishableKey: env.supabasePublishableKey,
     geminiApiKey: env.geminiApiKey,
-    geminiModel: env.geminiModel,
+    geminiModel,
+    geminiFallbackModel,
   };
 }

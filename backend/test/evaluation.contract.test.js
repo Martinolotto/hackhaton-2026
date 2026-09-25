@@ -11,6 +11,9 @@ import {
 } from "./fixtures/evaluation-cases.js";
 
 process.env.GEMINI_MODEL ??= "test-model";
+process.env.GEMINI_FALLBACK_MODEL ??= "test-fallback-model";
+
+const silentLogger = { info() {} };
 
 async function withServer(app, callback) {
   const server = app.listen(0, "127.0.0.1");
@@ -37,6 +40,7 @@ function authForTests() {
 
 function serviceReturning(contentFactory = () => buildEvaluationContent()) {
   return createEvaluationService({
+    logger: silentLogger,
     createInteraction: async (request) => {
       const evaluationRequest = JSON.parse(request.input.split("\n").slice(1).join("\n"));
       return {
@@ -130,9 +134,18 @@ test("produce evaluaciones initial y reevaluated compatibles con el contrato", a
 
 test("mapea JSON Gemini inválido, salida inválida y errores a 503 sin respuesta parcial", async () => {
   const services = [
-    createEvaluationService({ createInteraction: async () => ({ output_text: "not-json" }) }),
-    createEvaluationService({ createInteraction: async () => ({ output_text: JSON.stringify({}) }) }),
-    createEvaluationService({ createInteraction: async () => Promise.reject(new Error("quota")) }),
+    createEvaluationService({
+      logger: silentLogger,
+      createInteraction: async () => ({ output_text: "not-json" }),
+    }),
+    createEvaluationService({
+      logger: silentLogger,
+      createInteraction: async () => ({ output_text: JSON.stringify({}) }),
+    }),
+    createEvaluationService({
+      logger: silentLogger,
+      createInteraction: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
+    }),
   ];
 
   for (const evaluate of services) {
@@ -210,6 +223,7 @@ test("envía la URL como texto sin tools, Search, URL Context ni navegación", a
   let capturedRequest;
   let capturedOptions;
   const evaluate = createEvaluationService({
+    logger: silentLogger,
     createInteraction: async (request, options) => {
       capturedRequest = request;
       capturedOptions = options;

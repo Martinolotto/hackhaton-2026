@@ -32,8 +32,9 @@ Endpoints:
 - `SUPABASE_URL`: URL pública del proyecto Supabase.
 - `SUPABASE_PUBLISHABLE_KEY`: publishable key de Supabase usada para Auth.
 - `GEMINI_API_KEY`: secreto privado; solo backend/Render.
-- `GEMINI_MODEL`: modelo configurable; valor inicial previsto
-  `gemini-3.8-flash`.
+- `GEMINI_MODEL`: modelo principal configurable.
+- `GEMINI_FALLBACK_MODEL`: segundo modelo configurable para un único intento de
+  failover ante indisponibilidad o timeout del principal; debe ser distinto.
 
 Nunca versionar `.env`, tokens ni API keys. Ninguna variable de Gemini pertenece
 al frontend.
@@ -52,11 +53,14 @@ Antes de la demo, comprobar de forma segura que la API key tiene acceso al model
 configurado. El comando solo consulta metadata y no imprime la key:
 
 ```bash
-node --input-type=module -e 'import { GoogleGenAI } from "@google/genai"; const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); await ai.models.get({ model: process.env.GEMINI_MODEL }); console.log("Modelo accesible");'
+node --input-type=module -e 'import { GoogleGenAI } from "@google/genai"; const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }); await ai.models.get({ model: process.env.GEMINI_MODEL }); console.log(`${process.env.GEMINI_MODEL}: accesible`); await ai.models.get({ model: process.env.GEMINI_FALLBACK_MODEL }); console.log(`${process.env.GEMINI_FALLBACK_MODEL}: accesible`);'
 ```
 
-No existe fallback silencioso de modelo. Un fallo, cuota agotada, timeout o salida
-inválida de Gemini produce `503 EVALUATION_UNAVAILABLE` sin evaluación parcial.
+Cada evaluación realiza como máximo un intento por modelo y usa el fallback solo
+ante `503/UNAVAILABLE` o timeout del proveedor. Cada intento tiene un máximo de 20
+segundos y ambos comparten un presupuesto total de 30 segundos. No hay retries del
+SDK. Si ninguno produce una salida válida, se responde
+`503 EVALUATION_UNAVAILABLE` sin evaluación parcial.
 
 ## Render
 
