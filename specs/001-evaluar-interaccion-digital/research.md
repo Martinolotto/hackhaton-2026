@@ -115,10 +115,11 @@ scraping fueron descartados expresamente por alcance.
 
 ## 5. Timeout, reintentos y errores del evaluador
 
-**Decisión**: aplicar un timeout de 20 segundos por operación y ningún retry
-automático en el MVP. Timeout, red, error del SDK, cuota de Gemini, JSON inválido o
-fallo Zod se mapean a `503 EVALUATION_UNAVAILABLE`. Un 429 de Gemini nunca se
-propaga como 429 del producto.
+**Decisión**: ningún retry automático. La cadena NVIDIA → Gemini principal → Gemini
+fallback usa 5 segundos para NVIDIA, 10 para cada Gemini y 25 segundos globales.
+Cada candidato recibe el mínimo entre su propio límite y el presupuesto restante.
+Timeout, red, error del SDK, cuota de proveedor, JSON inválido o fallo Zod se mapean
+a `503 EVALUATION_UNAVAILABLE`. Un 429 externo nunca se propaga como 429 del producto.
 
 **Justificación**: evita multiplicar costo y latencia en un recorrido de
 hackathon. El 429 público queda reservado al rate limit propio. No se devuelve
@@ -200,3 +201,28 @@ multimodal de Interactions.
 **Justificación**: conserva exactamente JSON y texto cuando no hay captura, valida
 MIME y firma, permite reenviar el mismo `File` en la reevaluación y evita Storage,
 tablas, filesystem, OCR, EXIF y herramientas externas.
+
+## 10. NVIDIA primario y failover entre proveedores
+
+**Decisión**: usar `openai` contra `https://integrate.api.nvidia.com/v1` con
+`NVIDIA_MODEL` como primer candidato. Ante un error transitorio clasificado se
+intentan una vez `GEMINI_MODEL` y luego `GEMINI_FALLBACK_MODEL`. Los tres comparten
+25 segundos; NVIDIA recibe como máximo 5 y cada Gemini 10. Si falta
+`NVIDIA_API_KEY` o `NVIDIA_MODEL`, NVIDIA se omite y Gemini comienza la cadena.
+
+**Justificación**: la indisponibilidad real intermitente de Gemini pone en riesgo la
+demo. NVIDIA documenta `z-ai/glm-5.3-flash` como modelo de texto e imagen y su NIM
+expone Chat Completions OpenAI-compatible. Para imagen se usa el arreglo estándar
+`text` + `image_url` con data URL. La referencia específica no documenta
+`response_format`; por eso se exige JSON puro y el resultado continúa pasando por
+el mismo `JSON.parse` y Zod. No se altera el contrato HTTP ni el frontend.
+
+**Failover**: únicamente 429 temporal, 502/503/504, timeout o conexión temporal
+reconocida activan el candidato siguiente. Un error interno, request del proveedor
+no válido o salida que incumple el schema no se ocultan mediante cascada.
+
+**Fuentes oficiales**:
+
+- [Modelo GLM-5.3-Flash en NVIDIA](https://build.nvidia.com/z-ai/glm-5-3-flash/modelcard)
+- [API específica del modelo](https://docs.api.nvidia.com/nim/reference/z-ai-glm-5-3-flash-infer)
+- [API NIM para entrada multimodal](https://docs.nvidia.com/nim/large-language-models/latest/api-reference.html)

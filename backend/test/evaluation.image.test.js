@@ -4,10 +4,12 @@ import { createApp } from "../src/app.js";
 import { createRequireAuth } from "../src/middlewares/authenticate.js";
 import { evaluationResponseSchema } from "../src/schemas/evaluation.schemas.js";
 import { createEvaluationService } from "../src/services/evaluation.service.js";
+import { createGeminiProvider } from "../src/services/providers/gemini.provider.js";
 import { buildEvaluationContent, buildEvaluationResponse, evaluationCases } from "./fixtures/evaluation-cases.js";
 
 process.env.GEMINI_MODEL ??= "test-model";
 process.env.GEMINI_FALLBACK_MODEL ??= "test-fallback-model";
+process.env.NVIDIA_MODEL ??= "test-nvidia-model";
 
 const silentLogger = { info() {} };
 const imageFixtures = {
@@ -57,9 +59,9 @@ test("la evaluación sin imagen conserva el input textual existente", async () =
   let capturedInput;
   const evaluate = createEvaluationService({
     logger: silentLogger,
-    createInteraction: async (request) => {
-      capturedInput = request.input;
-      return { output_text: JSON.stringify(buildEvaluationContent()) };
+    evaluateNvidia: async ({ textInput }) => {
+      capturedInput = textInput;
+      return JSON.stringify(buildEvaluationContent());
     },
   });
 
@@ -153,14 +155,15 @@ test("rechaza una imagen mayor a 4 MB con 413", async () => {
   });
 });
 
-test("entrega texto e imagen a Gemini y valida el mismo structured output", async () => {
+test("el fallback entrega texto e imagen a Gemini y valida el mismo structured output", async () => {
   let capturedRequest;
   const evaluate = createEvaluationService({
     logger: silentLogger,
-    createInteraction: async (request) => {
+    evaluateNvidia: async () => Promise.reject(Object.assign(new Error("unavailable"), { status: 503 })),
+    evaluateGemini: createGeminiProvider({ createInteraction: async (request) => {
       capturedRequest = request;
       return { output_text: JSON.stringify(buildEvaluationContent()) };
-    },
+    } }),
   });
   const image = { buffer: imageFixtures["image/png"], mimeType: "image/png" };
 

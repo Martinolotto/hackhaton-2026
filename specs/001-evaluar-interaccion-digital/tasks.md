@@ -122,6 +122,14 @@ desplegable.
 - [x] T046 [TEST] Cubrir formatos, tamaño, input multimodal, structured output, failover, reevaluación y ausencia de persistencia en `backend/test/evaluation.image.test.js` y `backend/test/evaluation.failover.test.js`.
 - [x] T047 [INTEGRATION] Ejecutar `backend: npm test`, `frontend: npm run lint`, `frontend: npm run build` y `git diff --check`.
 
+## Resiliencia aprobada — NVIDIA primario
+
+- [x] T048 [SHARED] Documentar la decisión de NVIDIA primario y el failover sin cambiar OpenAPI ni respuesta contractual en `plan.md`, `research.md` y `quickstart.md`.
+- [x] T049 [BACKEND] Agregar el cliente NVIDIA y adaptadores mínimos en `backend/src/config/nvidia.js` y `backend/src/services/providers/`, conservando Gemini.
+- [x] T050 [BACKEND] Orquestar NVIDIA → Gemini principal → Gemini fallback con un intento por candidato y presupuesto global en `backend/src/services/evaluation.service.js`.
+- [x] T051 [TEST] Cubrir texto, imagen, salida Zod, reevaluación, fallos transitorios, error interno y presupuesto sin loops en `backend/test/`.
+- [ ] T052 [INTEGRATION] Ejecutar tests backend, lint/build frontend, `git diff --check` y los smokes NVIDIA reales documentados en `backend/README.md`.
+
 ## Dependencias y orden de ejecución
 
 ### Dependencias por fase
