@@ -175,9 +175,12 @@ específica; no se crean modelos de persistencia, repositorios ni carpetas vací
 
 ### Reevaluación
 
-El frontend permite un solo envío con `verificationResult`, reenvía la interacción
-original y reemplaza la vista por la respuesta `phase: reevaluated`. Después
-deshabilita definitivamente otra reevaluación durante ese recorrido. El backend es
+El frontend permite un solo envío con `verificationResult` y reenvía la interacción
+original. Conserva en memoria tanto la evaluación inicial como la reevaluación
+`phase: reevaluated` y muestra una comparación visible que distingue qué cambió,
+qué permaneció, qué incertidumbre continúa y qué información faltante continúa.
+Después deshabilita definitivamente otra reevaluación durante ese recorrido. Esta
+comparación no agrega persistencia ni modifica el contrato OpenAPI. El backend es
 stateless: valida que cada request contenga cero o un resultado, pero no crea un
 `caseId` ni intenta contar recorridos entre requests.
 
