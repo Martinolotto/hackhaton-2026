@@ -12,16 +12,22 @@ const reports = [
 
 export default function Foro() {
   return (
-    <div className="at-page">
+    <div className="at-page forum-page">
       <Nav />
       <main className="at-main" id="contenido-principal" tabIndex="-1">
-        <header className="at-intro forum-intro">
-          <div>
+        <header className="forum-community-header">
+          <span className="forum-community-icon" aria-hidden="true"><UserRound size={28} /></span>
+          <div className="forum-community-copy">
             <SplitText tag="h1" text="Comunidad: experiencias que suman contexto." />
             <p>Busca dominios, cuentas o patrones. Los reportes aportan evidencia colectiva, pero no reemplazan una verificación independiente.</p>
           </div>
-          <div className="forum-intro-actions">
-            <Link className="at-button" to="/evaluar">Evaluar interacción <ArrowRight size={18} aria-hidden="true" /></Link>
+
+        </header>
+
+        <div className="forum-workspace">
+          <aside className="forum-sidebar" aria-label="Opciones del foro">
+            <Link className="at-button forum-evaluate-link" to="/evaluar">Evaluar interacción <ArrowRight size={18} aria-hidden="true" /></Link>
+
             <aside className="forum-profile" aria-label="Perfil de comunidad">
               <span className="forum-profile-icon" aria-hidden="true"><UserRound size={24} /></span>
               <div>
@@ -31,13 +37,52 @@ export default function Foro() {
                 <Link to="/login">Ingresar</Link>
               </div>
             </aside>
-          </div>
-        </header>
 
-        <form className="forum-search" role="search"><label className="at-label" htmlFor="forum-search">Busca una entidad, cuenta o patrón<input className="at-search" id="forum-search" type="search" placeholder="Ej.: dominio, nombre de cuenta o tipo de solicitud" /></label><button className="at-button" type="button"><Search size={18} aria-hidden="true" />Buscar</button></form>
-        <div className="forum-filters" aria-label="Filtros de reportes"><button className="at-filter" type="button" aria-pressed="true">Todos</button><button className="at-filter" type="button" aria-pressed="false">Canal</button><button className="at-filter" type="button" aria-pressed="false">Tipo de interacción</button><button className="at-filter" type="button" aria-pressed="false">Vigencia</button><button className="at-filter" type="button" aria-pressed="false">Fecha</button></div>
+            <div className="forum-sidebar-filters">
+              <p>Filtrar reportes</p>
+              <div className="forum-filters" aria-label="Filtros de reportes">
+                <button className="at-filter" type="button" aria-pressed="true">Todos</button>
+                <button className="at-filter" type="button" aria-pressed="false">Canal</button>
+                <button className="at-filter" type="button" aria-pressed="false">Tipo de interacción</button>
+                <button className="at-filter" type="button" aria-pressed="false">Vigencia</button>
+                <button className="at-filter" type="button" aria-pressed="false">Fecha</button>
+              </div>
+            </div>
+          </aside>
 
-        <div className="forum-layout"><section aria-labelledby="reports-title"><header className="at-section-heading"><SplitText tag="h2" id="reports-title" text="Reportes de ejemplo" /><p>Maquetado sin datos en tiempo real.</p></header><div className="report-list">{reports.map(([title, copy, channel, status]) => <article className="report-card" key={title}><div><SplitText tag="h3" text={title} /><p>{copy}</p><div className="report-details"><span>{channel}</span><span>·</span><span>Fecha por corroborar</span><span>·</span><span>Fuentes disponibles</span></div></div><span className="report-status">{status}</span></article>)}</div></section><aside className="signal-panel" aria-labelledby="signal-title"><SplitText tag="h2" id="signal-title" text="Red de señales" /><p>Representación decorativa de cómo se agrupan fuentes, reportes y patrones. No representa actividad en vivo.</p><span className="signal-line signal-line-one" /><span className="signal-line signal-line-two" /><span className="signal-node signal-node-one" /><span className="signal-node signal-node-two" /><span className="signal-node signal-node-three" /><span className="signal-node signal-node-four" /></aside></div>
+          <section className="forum-feed" aria-labelledby="reports-title">
+            <form className="forum-search" role="search">
+              <label className="at-label" htmlFor="forum-search">Busca una entidad, cuenta o patrón
+                <input className="at-search" id="forum-search" type="search" placeholder="Ej.: dominio, nombre de cuenta o tipo de solicitud" />
+              </label>
+              <button className="at-button" type="button"><Search size={18} aria-hidden="true" />Buscar</button>
+            </form>
+
+            <header className="at-section-heading forum-feed-heading">
+              <SplitText tag="h2" id="reports-title" text="Reportes de ejemplo" />
+              <p>Maquetado sin datos en tiempo real.</p>
+            </header>
+            <div className="report-list">
+              {reports.map(([title, copy, channel, status]) => (
+                <article className="report-card" key={title}>
+                  <div>
+                    <SplitText tag="h3" text={title} />
+                    <p>{copy}</p>
+                    <div className="report-details"><span>{channel}</span><span>·</span><span>Fecha por corroborar</span><span>·</span><span>Fuentes disponibles</span></div>
+                  </div>
+                  <span className="report-status">{status}</span>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <aside className="signal-panel" aria-labelledby="signal-title">
+            <SplitText tag="h2" id="signal-title" text="Red de señales" />
+            <p>Representación decorativa de cómo se agrupan fuentes, reportes y patrones. No representa actividad en vivo.</p>
+            <span className="signal-line signal-line-one" /><span className="signal-line signal-line-two" />
+            <span className="signal-node signal-node-one" /><span className="signal-node signal-node-two" /><span className="signal-node signal-node-three" /><span className="signal-node signal-node-four" />
+          </aside>
+        </div>
       </main>
     </div>
   );

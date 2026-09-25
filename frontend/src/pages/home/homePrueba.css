@@ -1,22 +1,22 @@
 .home-prueba {
-  --hp-canvas: #e2e8f0;
-  --hp-surface: #ffffff;
-  --hp-surface-subtle: #f1f5f9;
-  --hp-surface-accent: #f0fdfa;
-  --hp-ink: #0f172a;
-  --hp-muted: #475569;
-  --hp-border: #cbd5e1;
-  --hp-border-strong: #64748b;
+  --hp-canvas: #07111f;
+  --hp-surface: #0b1829;
+  --hp-surface-subtle: #0b1829;
+  --hp-surface-accent: #0e2235;
+  --hp-ink: #f8fafc;
+  --hp-muted: #cbd5e1;
+  --hp-border: #20364e;
+  --hp-border-strong: #7890aa;
   --hp-primary: #2563eb;
   --hp-primary-hover: #1d4ed8;
-  --hp-accent: #0f766e;
-  --hp-accent-hover: #115e59;
-  --hp-caution: #b45309;
-  --hp-critical: #b91c1c;
+  --hp-accent: #22d3ee;
+  --hp-accent-hover: #67e8f9;
+  --hp-caution: #fbbf24;
+  --hp-critical: #f87171;
   --hp-focus: #2563eb;
-  --hp-accent-soft: #ccfbf1;
-  --hp-primary-soft: #dbeafe;
-  --hp-caution-soft: #fef3c7;
+  --hp-accent-soft: #0e3a4a;
+  --hp-primary-soft: #102a56;
+  --hp-caution-soft: #422c12;
   --hp-shadow-float: 0 12px 32px rgb(15 23 42 / 10%);
   --hp-nav-height: 72px;
   min-height: 100dvh;
@@ -30,24 +30,24 @@
 }
 
 .hp-header {
-  --hp-canvas: #e2e8f0;
-  --hp-surface: #ffffff;
-  --hp-surface-subtle: #f1f5f9;
-  --hp-surface-accent: #f0fdfa;
-  --hp-ink: #0f172a;
-  --hp-muted: #475569;
-  --hp-border: #cbd5e1;
-  --hp-border-strong: #64748b;
+  --hp-canvas: #07111f;
+  --hp-surface: #0b1829;
+  --hp-surface-subtle: #0b1829;
+  --hp-surface-accent: #0e2235;
+  --hp-ink: #f8fafc;
+  --hp-muted: #cbd5e1;
+  --hp-border: #20364e;
+  --hp-border-strong: #7890aa;
   --hp-primary: #2563eb;
   --hp-primary-hover: #1d4ed8;
-  --hp-accent: #0f766e;
-  --hp-accent-hover: #115e59;
-  --hp-caution: #b45309;
-  --hp-critical: #b91c1c;
+  --hp-accent: #22d3ee;
+  --hp-accent-hover: #67e8f9;
+  --hp-caution: #fbbf24;
+  --hp-critical: #f87171;
   --hp-focus: #2563eb;
-  --hp-accent-soft: #ccfbf1;
-  --hp-primary-soft: #dbeafe;
-  --hp-caution-soft: #fef3c7;
+  --hp-accent-soft: #0e3a4a;
+  --hp-primary-soft: #102a56;
+  --hp-caution-soft: #422c12;
   --hp-shadow-float: 0 12px 32px rgb(15 23 42 / 10%);
 }
 
