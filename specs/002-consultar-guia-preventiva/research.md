@@ -30,9 +30,9 @@ alcance con el menor costo y riesgo.
 sin agregar una ruta paralela.
 
 **Fundamento**: la SPA ya expone `/aprendizaje` como ruta pública, la landing y
-`Nav` ya enlazan a ella, y el placeholder existente representa la intención de
-prevención. Reutilizarla evita enlaces duplicados, redirects y cambios de
-navegación innecesarios.
+`Nav` ya enlazan a ella, y la página contiene un diseño completo de Gastón con
+sidebar, hero, búsqueda y selector maestro-detalle. Reutilizarla evita enlaces
+duplicados, redirects y una reconstrucción visual innecesaria.
 
 **Alternativas consideradas**:
 
@@ -59,39 +59,40 @@ bloques. Sigue siendo contenido editorial fijo y versionado.
   transformación adicional y complica controlar la semántica y el diseño.
 - JSON remoto: rechazado porque reintroduce red y actualización dinámica.
 
-## 4. Un componente repetible para bloques
+## 4. Reutilizar el selector maestro-detalle existente
 
-**Decisión**: usar un solo `GuideSection` para la plantilla “qué mirar / por qué
+**Decisión**: mantener la lista de temas y el panel de detalle de
+`educacion.jsx`. Cada tema seleccionado presenta la plantilla “qué mirar / por qué
 importa / cómo comprobarlo / ejemplo / qué no asumir / fuentes”; la página compone
-introducción, índice, checklist, cierre y fuentes finales.
+introducción, checklist, cierre y fuentes finales.
 
-**Fundamento**: es la única abstracción repetida con responsabilidad real. Reduce
-errores de omisión sin fragmentar la página en componentes triviales.
-
-**Alternativas consideradas**:
-
-- Un componente por tema: rechazado por sobrearquitectura y porque los temas no
-  tienen comportamiento propio.
-- Ningún componente: posible, pero aumenta la duplicación de markup y el riesgo de
-  jerarquías inconsistentes.
-
-## 5. Navegación simple mediante anclas nativas
-
-**Decisión**: ofrecer un índice visible que enlaza a identificadores estables de
-los bloques en la misma página.
-
-**Fundamento**: RF-021 exige localizar una categoría sin leer todo. Las anclas
-nativas funcionan con teclado, no dependen de estado ni de servicios y degradan
-correctamente.
+**Fundamento**: el patrón ya está implementado, es responsive y preserva la
+identidad visual actual. Los datos editoriales estructurados reducen errores de
+omisión sin agregar componentes artificiales.
 
 **Alternativas consideradas**:
 
-- Buscador o filtros: rechazados porque la colección es pequeña, añaden estado y
-  el placeholder actual simula una capacidad no requerida.
+- Un componente nuevo por tema: rechazado por sobrearquitectura y porque los temas
+  no tienen comportamiento propio.
+- Sustituir la página por una lista de artículos: rechazado porque descarta trabajo
+  visual vigente y amplía la superficie.
+
+## 5. Navegación interna y búsqueda local existentes
+
+**Decisión**: conservar el sidebar con anclas a las áreas principales y la búsqueda
+local que filtra únicamente los siete bloques estáticos. La lista lateral del
+selector permite elegir cada habilidad.
+
+**Fundamento**: RF-021 exige localizar una categoría sin leer todo. El diseño
+actual ya resuelve exploración, búsqueda y detalle sin red ni almacenamiento.
+
+**Alternativas consideradas**:
+
+- Eliminar la búsqueda: rechazado porque es una interacción local ya implementada
+  y útil para localizar categorías sin ampliar alcance.
 - Acordeones: rechazados como mecanismo principal porque pueden ocultar cautelas y
   complicar navegación y accesibilidad.
-- Índice sticky: no se requiere en el incremento mínimo; puede generar problemas
-  de foco o espacio en mobile.
+- Una navegación nueva: rechazada porque el sidebar actual ya se adapta a mobile.
 
 ## 6. Integración por enlace con la evaluación existente
 
@@ -128,9 +129,10 @@ período/contexto y límite no exhaustivo según RF-027.
 
 ## 8. Estilos locales y activos existentes
 
-**Decisión**: reutilizar tokens, tipografía, `Nav`, botones y convenciones visuales
-existentes, con una hoja de estilos específica para la página. No agregar imágenes
-ni animaciones necesarias para comprender el contenido.
+**Decisión**: reutilizar tokens, tipografía, `Nav`, `DotField`, sidebar, cards,
+botones y selector existentes, con una hoja de estilos específica solo para las
+extensiones de esta feature. No agregar imágenes ni animaciones necesarias para
+comprender el contenido.
 
 **Fundamento**: preserva coherencia visual y mantiene los cambios aislados. La
 jerarquía debe seguir siendo comprensible sin decoración.

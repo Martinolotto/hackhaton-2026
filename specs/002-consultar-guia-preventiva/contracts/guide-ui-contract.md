@@ -25,8 +25,9 @@ contenido de la guía.
 En este orden conceptual:
 
 1. introducción, límites y fecha de actualización editorial;
-2. índice navegable de habilidades;
-3. siete bloques preventivos de `content-guide.md`;
+2. navegación interna y búsqueda local sobre contenido estático;
+3. selector accesible desde el que puedan consultarse los siete bloques
+   preventivos de `content-guide.md`;
 4. checklist de cinco preguntas;
 5. cierre que diferencia guía y evaluación;
 6. CTA “Evaluar una interacción”;
@@ -47,9 +48,10 @@ Cada bloque 1–7 debe exponer mediante HTML semántico:
 - “Qué no asumir”;
 - IDs de fuentes correspondientes.
 
-La navegación interna debe llevar a un encabezado identificable y no debe ocultar
-su contenido. Ninguna sección puede asignar score, estado “seguro”, “fraude” o
-resultado equivalente.
+La navegación interna debe llevar a un encabezado identificable. El selector debe
+exponer los siete temas, anunciar cuál está activo y mostrar su contenido completo;
+la búsqueda local no puede inventar resultados ni depender de servicios. Ninguna
+sección puede asignar score, estado “seguro”, “fraude” o resultado equivalente.
 
 ## Contrato especial de patrones en Argentina
 
@@ -102,6 +104,7 @@ reevaluaciones de 001.
 
 ## Comportamientos expresamente ausentes
 
-No hay búsqueda funcional, filtros, formularios de caso, escaneo, análisis,
-diagnóstico, descarga de fuentes, sincronización, personalización, historial,
-alertas ni actualización automática.
+No hay búsqueda remota, filtros de amenazas, formularios de caso, escaneo,
+análisis, diagnóstico, descarga de fuentes, sincronización, personalización,
+historial, alertas ni actualización automática. La búsqueda existente se limita a
+filtrar en memoria los siete bloques editoriales cargados con la página.

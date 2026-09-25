@@ -8,14 +8,16 @@
 
 ## Resumen
 
-Convertir la superficie pública existente `/aprendizaje` en una guía preventiva
-estática, escaneable y adaptable a pantallas angostas y amplias. React renderizará
-el contenido curado de [content-guide.md](content-guide.md) desde una estructura
-local versionada, con navegación por secciones, siete bloques de habilidad,
-checklist, fuentes y fecha editorial. El CTA “Evaluar una interacción” enlazará a
-la ruta protegida `/evaluar`; `ProtectedRoute` y Supabase Auth conservarán el
-comportamiento ya implementado por la feature 001. No habrá llamadas para obtener
-el contenido, persistencia, endpoints ni cambios en backend.
+Completar la superficie pública existente `/aprendizaje` como guía preventiva
+estática, conservando el workspace visual implementado por Gastón: sidebar, hero
+con `DotField`, búsqueda local, selector maestro-detalle, cards, tokens y
+responsive actuales. React renderizará el contenido curado de
+[content-guide.md](content-guide.md) desde una estructura local versionada, con
+siete bloques de habilidad, checklist, fuentes y fecha editorial. El CTA “Evaluar
+una interacción” enlazará a la ruta protegida `/evaluar`; `ProtectedRoute` y
+Supabase Auth conservarán el comportamiento ya implementado por la feature 001.
+No habrá llamadas para obtener el contenido, persistencia, endpoints ni cambios
+en backend.
 
 ## Contexto técnico
 
@@ -40,8 +42,8 @@ desktop y mobile. La guía debe seguir renderizando aunque backend, Gemini o
 servicios externos no estén disponibles.
 
 **Objetivos de rendimiento**: contenido completo disponible con la carga inicial
-de la ruta, sin requests de contenido ni espera de backend; sin imágenes pesadas,
-widgets remotos o lógica de búsqueda. La navegación entre bloques debe responder
+de la ruta, sin requests de contenido ni espera de backend; sin imágenes pesadas
+ni widgets remotos. La búsqueda local y la selección entre bloques deben responder
 de inmediato en el navegador.
 
 **Restricciones**: acceso público; contenido editorial estático y común; ninguna
@@ -70,7 +72,7 @@ principalmente al dominio frontend.
 | Express para lógica específica | No existe lógica de servidor que justifique Express ni un endpoint nuevo. |
 | Secretos seguros | No se agregan variables ni secretos; las fuentes son URLs públicas y estáticas. |
 | `main` desplegable | La implementación futura se validará en la rama de feature y luego seguirá el flujo de integración humano aprobado. |
-| Simplicidad de 24 horas | Se reutilizan `/aprendizaje`, `Nav`, estilos y `/evaluar`; no se agrega CMS, parser Markdown, buscador ni dependencia nueva. |
+| Simplicidad de 24 horas | Se reutilizan `/aprendizaje`, `Nav`, `DotField`, búsqueda local, cards, estilos y `/evaluar`; no se agrega CMS, parser Markdown ni dependencia nueva. |
 | Contratos explícitos | El contrato UI documenta acceso, contenido y transición hacia 001; no hay contrato frontend/backend nuevo. |
 | SDD en español | Todos los artefactos propios de esta feature están redactados en español. |
 
@@ -104,28 +106,28 @@ frontend/
 ├── src/
 │   ├── App.jsx                                  # conserva /aprendizaje pública y /evaluar protegida
 │   ├── components/
-│   │   ├── guide/
-│   │   │   └── GuideSection.jsx                # plantilla semántica repetida para bloques 1–7
-│   │   └── navegation/
-│   │       └── nav.jsx                         # acceso existente “Aprendizaje”
+│   │   ├── DotField.jsx                        # fondo interactivo existente del hero
+│   │   └── navegation/nav.jsx                  # acceso existente “Aprendizaje”
 │   ├── content/
 │   │   └── preventive-guide.js                 # contenido curado, fuentes y metadatos estáticos
 │   └── pages/
+│       ├── app-sections.css                    # tokens y patrones visuales compartidos existentes
 │       └── Educacion preventiva/
-│           ├── educacion.jsx                   # composición de guía, índice, checklist, fuentes y CTA
-│           └── educacion.css                   # estilos específicos responsive y de lectura
+│           ├── educacion.jsx                   # workspace actual con guía, checklist, fuentes y CTA
+│           └── educacion.css                   # extensiones locales sin afectar foro/evaluación
 └── package.json
 
 backend/                                        # sin cambios para esta feature
 ```
 
-**Decisión de estructura**: conservar la ruta y página de aprendizaje ya
-integradas para evitar una segunda superficie equivalente. Separar el texto
+**Decisión de estructura**: conservar y completar la ruta y página de aprendizaje
+ya diseñadas, en lugar de sustituirlas por una nueva composición. Separar el texto
 curado en un módulo estático facilita verificar su fidelidad contra
-`content-guide.md`, mientras un único componente compartido evita duplicar la
-estructura “qué mirar / por qué / cómo / ejemplo / qué no asumir / fuentes”. Los
-estilos propios quedan junto a la página para no ampliar el CSS común. No se
-crean capas de servicio, modelos persistentes ni carpetas backend.
+`content-guide.md`; `educacion.jsx` reutiliza el selector maestro-detalle actual
+para la plantilla “qué mirar / por qué / cómo / ejemplo / qué no asumir /
+fuentes”. Los estilos nuevos quedan junto a la página para no alterar el CSS que
+comparten foro y evaluación. No se crean capas de servicio, componentes
+artificiales, modelos persistentes ni carpetas backend.
 
 ## Diseño técnico
 
@@ -135,18 +137,18 @@ crean capas de servicio, modelos persistentes ni carpetas backend.
    `/aprendizaje`.
 2. `App.jsx` mantiene esa ruta fuera de `ProtectedRoute`; el contenido se muestra
    con o sin sesión.
-3. La página presenta introducción y fecha editorial, seguida de un índice de
-   enlaces internos que permite saltar a cada habilidad.
-4. `GuideSection` renderiza los bloques 1–7 con jerarquía semántica consistente y
-   las seis partes editoriales definidas. El bloque argentino conserva organismo,
-   ámbito, período/contexto y carácter ilustrativo no exhaustivo.
-5. La página muestra el checklist como pausa de decisión y termina con las
-   fuentes completas y el CTA hacia evaluación.
+3. La página conserva el hero y la búsqueda local; el sidebar enlaza introducción,
+   guía, checklist y fuentes dentro de la misma superficie.
+4. El selector maestro-detalle existente permite consultar los bloques 1–7 con
+   jerarquía semántica consistente y las seis partes editoriales definidas. El
+   bloque argentino conserva organismo, ámbito, período/contexto y carácter
+   ilustrativo no exhaustivo.
+5. La página muestra el checklist como pausa de decisión y termina con las fuentes
+   completas, el contexto editorial y el CTA hacia evaluación.
 
 El módulo `preventive-guide.js` será una transcripción fiel y estructurada de
-`content-guide.md`, no una nueva redacción. No habrá fetch, generación dinámica,
-filtrado ni buscador: la persona puede localizar secciones mediante el índice y
-los encabezados visibles.
+`content-guide.md`, no una nueva redacción. La búsqueda existente filtra únicamente
+los datos locales ya cargados y no genera, clasifica ni consulta contenido remoto.
 
 ### Integración con la feature 001
 
@@ -177,20 +179,20 @@ los encabezados visibles.
 
 ### Experiencia visual y accesibilidad
 
-- Reutilizar `Nav`, tipografía Geist, tokens, superficies, botones y anchos del
-  sistema existente; no agregar imágenes ni animaciones necesarias para entender
-  el contenido.
+- Reutilizar `Nav`, `DotField`, sidebar, selector maestro-detalle, tipografía
+  Geist, tokens, superficies, botones y anchos del sistema existente; no agregar
+  imágenes ni animaciones necesarias para entender el contenido.
 - Mantener prosa en una columna de lectura acotada y usar tarjetas/callouts solo
   para diferenciar acciones, ejemplos y límites sin convertir indicadores en
   estados de riesgo.
-- El índice usa enlaces internos nativos; encabezados, listas, ejemplos y fuentes
-  conservan semántica HTML y orden lógico sin JavaScript.
+- El sidebar usa enlaces internos nativos y el selector usa botones accesibles;
+  encabezados, listas, ejemplos y fuentes conservan semántica HTML y orden lógico.
 - Los enlaces externos tienen texto descriptivo; el foco es visible; ninguna
   información depende solo de color o iconos; el contenido sigue usable con
   teclado, 200 % de zoom y ancho de 375 px.
-- En pantallas angostas, índice y bloques fluyen en una sola columna sin ocultar
-  texto. No se planifica índice sticky, carrusel ni disclosure obligatorio para
-  evitar complejidad y pérdida accidental de contenido.
+- En pantallas angostas, el sidebar actual pasa a navegación horizontal adaptable
+  y el selector maestro-detalle fluye en una sola columna sin ocultar texto. No se
+  agrega carrusel ni disclosure obligatorio.
 
 ## Responsabilidades
 
@@ -198,9 +200,10 @@ los encabezados visibles.
 
 - Transcribir `content-guide.md` al módulo estático sin alterar afirmaciones,
   fuentes, fechas ni cautelas.
-- Reemplazar el placeholder actual de `/aprendizaje`, implementar la presentación
-  responsive, los enlaces internos y el CTA, y validar lint/build.
-- No agregar búsqueda simulada, llamadas API, persistencia ni lógica de detección.
+- Integrar el contenido aprobado en la experiencia actual de `/aprendizaje`,
+  completar checklist, fuentes, navegación y CTA, y validar lint/build.
+- Conservar la búsqueda local existente, pero no agregar llamadas API,
+  persistencia ni lógica de detección.
 
 ### BACKEND — Martino
 
@@ -220,11 +223,11 @@ los encabezados visibles.
 | Riesgo | Mitigación planificada |
 | --- | --- |
 | Divergencia entre `content-guide.md` y el texto renderizado | Un único módulo de contenido, revisión bloque por bloque e IDs de fuente explícitos. |
-| Convertir la guía en biblioteca, buscador o feed | Una sola página, índice interno y contenido fijo; eliminar el buscador y las tarjetas de “guías recientes” del placeholder. |
+| Convertir la guía en biblioteca o feed | Una sola página y contenido fijo; la búsqueda existente solo filtra los siete bloques locales y las cards de relleno se reemplazan por checklist y fuentes aprobadas. |
 | Que el diseño sugiera detección o certeza | No usar puntajes, semáforos ni etiquetas “seguro/fraude”; mantener “qué no asumir” en cada bloque. |
 | Ocultar contexto temporal argentino | Modelar y mostrar fuente, organismo, ámbito, período/contexto y aviso no exhaustivo junto a los patrones. |
 | Romper el flujo de 001 | Enlazar a la ruta existente y cubrir redirección/autenticación en el smoke test, sin tocar API ni formularios. |
-| Sobrecargar mobile con contenido largo | Columna de lectura, índice con anclas, párrafos breves y bloques apilados; prueba a 375 px y 200 % de zoom. |
+| Sobrecargar mobile con contenido largo | Columna de lectura, sidebar adaptable, selector apilado y párrafos breves; prueba a 375 px y 200 % de zoom. |
 | Depender accidentalmente de servicios externos | Empaquetar todo el contenido en el frontend y probar la ruta con backend/Gemini no disponibles. |
 
 ## Comprobación constitucional posterior al diseño

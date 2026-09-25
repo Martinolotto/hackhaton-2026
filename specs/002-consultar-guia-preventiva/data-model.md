@@ -29,7 +29,7 @@ Unidad repetible que enseña una habilidad.
 
 | Campo | Tipo conceptual | Reglas |
 | --- | --- | --- |
-| `id` | identificador de ancla | Único, estable, legible y utilizable desde el índice. |
+| `id` | identificador de selección | Único, estable y utilizable por búsqueda y selector maestro-detalle. |
 | `title` | texto | Orientado a una habilidad, no a un veredicto. |
 | `whatToLookFor` | 2–4 señales observables | Ninguna señal se presenta como prueba. |
 | `whyItMatters` | texto breve | Explica el riesgo sin alarmismo. |
@@ -122,7 +122,7 @@ Guía preventiva
 
 ## Validaciones de integridad
 
-- Los siete IDs de sección son únicos y todos aparecen en el índice.
+- Los siete IDs de sección son únicos y todos aparecen en el selector de temas.
 - Cada sección contiene al menos una acción concreta y todas las partes de la
   plantilla editorial.
 - Cada ID de fuente referenciado existe y conserva sus metadatos y URL aprobados.
@@ -146,4 +146,5 @@ lectura pública de /aprendizaje
                     └── /evaluar → Auth existente de 001 cuando corresponda
 ```
 
-Los saltos entre bloques son navegación local por anclas y no alteran datos.
+Los saltos entre áreas usan anclas locales; elegir o buscar un bloque solo cambia
+estado efímero de presentación y no altera datos.

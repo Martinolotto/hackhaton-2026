@@ -103,15 +103,22 @@ Resultado esperado:
 
 ## Escenario 5 — Navegación y lectura
 
-1. Recorrer el índice solo con teclado.
-2. Activar cada enlace interno y comprobar el encabezado de destino.
-3. Recorrer secciones, fuentes y CTA sin mouse.
-4. Probar a 375 px, en una pantalla amplia y con zoom del navegador al 200 %.
+1. Recorrer el sidebar y el selector de siete temas solo con teclado.
+2. Activar cada tema y comprobar que el panel anuncia y muestra su contenido.
+3. Buscar términos presentes y ausentes; limpiar la consulta y confirmar que los
+   siete temas vuelven a estar disponibles.
+4. Recorrer checklist, fuentes y CTA sin mouse.
+5. Probar a 375 px, en una pantalla amplia y con zoom del navegador al 200 %.
+6. Con cada integrante del equipo, cronometrar la localización de una señal que
+   justifica cautela, una comprobación independiente y una circunstancia para
+   pausar o iniciar una evaluación.
 
 Resultado esperado:
 
 - foco visible y orden lógico;
-- todos los bloques se localizan desde el índice;
+- todos los bloques se localizan desde el selector o la búsqueda local;
+- cada integrante localiza los tres elementos cronometrados en menos de dos
+  minutos;
 - no hay contenido cortado ni scroll horizontal de página;
 - encabezados, listas y enlaces conservan jerarquía y legibilidad;
 - ninguna información depende de una animación, color o icono.
