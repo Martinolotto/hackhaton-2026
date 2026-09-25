@@ -56,6 +56,15 @@ export const env = {
   get nvidiaTimeoutMs() {
     return positiveInteger("NVIDIA_TIMEOUT_MS", 5_000);
   },
+  get ollamaApiKey() {
+    return optional("OLLAMA_API_KEY");
+  },
+  get ollamaModel() {
+    return optional("OLLAMA_MODEL");
+  },
+  get ollamaTimeoutMs() {
+    return positiveInteger("OLLAMA_TIMEOUT_MS", 15_000);
+  },
   get geminiModel() {
     return required("GEMINI_MODEL");
   },
@@ -66,13 +75,15 @@ export const env = {
     return positiveInteger("GEMINI_TIMEOUT_MS", 10_000);
   },
   get evaluationTimeoutMs() {
-    return positiveInteger("EVALUATION_TIMEOUT_MS", 25_000);
+    return positiveInteger("EVALUATION_TIMEOUT_MS", 35_000);
   },
 };
 
 export function validateEvaluationEnvironment() {
   const nvidiaApiKey = env.nvidiaApiKey;
   const nvidiaModel = env.nvidiaModel;
+  const ollamaApiKey = env.ollamaApiKey;
+  const ollamaModel = env.ollamaModel;
   const geminiModel = env.geminiModel;
   const geminiFallbackModel = env.geminiFallbackModel;
 
@@ -86,6 +97,9 @@ export function validateEvaluationEnvironment() {
     nvidiaApiKey,
     nvidiaModel,
     nvidiaTimeoutMs: env.nvidiaTimeoutMs,
+    ollamaApiKey,
+    ollamaModel,
+    ollamaTimeoutMs: env.ollamaTimeoutMs,
     geminiApiKey: env.geminiApiKey,
     geminiModel,
     geminiFallbackModel,

@@ -13,7 +13,7 @@ import {
 
 process.env.GEMINI_MODEL ??= "test-model";
 process.env.GEMINI_FALLBACK_MODEL ??= "test-fallback-model";
-process.env.NVIDIA_MODEL ??= "test-nvidia-model";
+process.env.OLLAMA_MODEL ??= "test-ollama-model";
 
 const silentLogger = { info() {} };
 
@@ -43,7 +43,7 @@ function authForTests() {
 function serviceReturning(contentFactory = () => buildEvaluationContent()) {
   return createEvaluationService({
     logger: silentLogger,
-    evaluateNvidia: async ({ textInput }) => {
+    evaluateOllama: async ({ textInput }) => {
       const evaluationRequest = JSON.parse(textInput.split("\n").slice(1).join("\n"));
       return JSON.stringify(contentFactory(evaluationRequest));
     },
@@ -136,15 +136,15 @@ test("mapea JSON de proveedor inválido, salida inválida y errores a 503 sin re
   const services = [
     createEvaluationService({
       logger: silentLogger,
-      evaluateNvidia: async () => "not-json",
+      evaluateOllama: async () => "not-json",
     }),
     createEvaluationService({
       logger: silentLogger,
-      evaluateNvidia: async () => JSON.stringify({}),
+      evaluateOllama: async () => JSON.stringify({}),
     }),
     createEvaluationService({
       logger: silentLogger,
-      evaluateNvidia: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
+      evaluateOllama: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
       evaluateGemini: async () => Promise.reject(Object.assign(new Error("quota"), { status: 429 })),
     }),
   ];
@@ -225,7 +225,7 @@ test("envía la URL como texto sin tools, Search, URL Context ni navegación", a
   let capturedOptions;
   const evaluate = createEvaluationService({
     logger: silentLogger,
-    evaluateNvidia: async () => Promise.reject(Object.assign(new Error("unavailable"), { status: 503 })),
+    evaluateOllama: async () => Promise.reject(Object.assign(new Error("unavailable"), { status: 503 })),
     evaluateGemini: createGeminiProvider({ createInteraction: async (request, options) => {
       capturedRequest = request;
       capturedOptions = options;

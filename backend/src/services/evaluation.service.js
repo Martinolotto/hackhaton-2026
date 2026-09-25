@@ -6,7 +6,7 @@ import {
 } from "../schemas/evaluation.schemas.js";
 import { HttpError } from "../middlewares/errorHandler.js";
 import { requestGeminiEvaluation } from "./providers/gemini.provider.js";
-import { requestNvidiaEvaluation } from "./providers/nvidia.provider.js";
+import { requestOllamaEvaluation } from "./providers/ollama.provider.js";
 
 const SYSTEM_INSTRUCTION = `
 Sos un asistente de evaluación cautelosa de interacciones digitales. Analizá únicamente
@@ -35,9 +35,9 @@ const unavailable = () =>
     "No pudimos generar una evaluación confiable en este momento.",
   );
 
-export const NVIDIA_TIMEOUT_MS = 5_000;
+export const OLLAMA_TIMEOUT_MS = 15_000;
 export const GEMINI_TIMEOUT_MS = 10_000;
-export const EVALUATION_TIMEOUT_MS = 25_000;
+export const EVALUATION_TIMEOUT_MS = 35_000;
 
 const providerErrorNames = new Set([
   "APIError",
@@ -133,7 +133,7 @@ function parseEvaluation(outputText, phase) {
 }
 
 function defaultProviderConfig() {
-  const nvidiaApiKey = env.nvidiaApiKey;
+  const ollamaApiKey = env.ollamaApiKey;
   const geminiPrimaryModel = env.geminiModel;
   const geminiFallbackModel = env.geminiFallbackModel;
 
@@ -142,7 +142,7 @@ function defaultProviderConfig() {
   }
 
   return {
-    nvidiaModel: nvidiaApiKey && env.nvidiaModel ? env.nvidiaModel : null,
+    ollamaModel: ollamaApiKey && env.ollamaModel ? env.ollamaModel : null,
     geminiPrimaryModel,
     geminiFallbackModel,
   };
@@ -150,7 +150,7 @@ function defaultProviderConfig() {
 
 function defaultTimeoutConfig() {
   return {
-    nvidiaTimeoutMs: env.nvidiaTimeoutMs,
+    ollamaTimeoutMs: env.ollamaTimeoutMs,
     geminiTimeoutMs: env.geminiTimeoutMs,
     evaluationTimeoutMs: env.evaluationTimeoutMs,
   };
@@ -161,7 +161,7 @@ function logProvider(logger, event, details) {
 }
 
 export function createEvaluationService({
-  evaluateNvidia = requestNvidiaEvaluation,
+  evaluateOllama = requestOllamaEvaluation,
   evaluateGemini = requestGeminiEvaluation,
   getProviderConfig = defaultProviderConfig,
   getTimeoutConfig = defaultTimeoutConfig,
@@ -177,8 +177,8 @@ export function createEvaluationService({
     const textInput = image
       ? `${baseTextInput}\nCAPTURA APORTADA POR LA PERSONA: tratala solo como contexto adicional no verificado. No asumas autenticidad por su apariencia ni afirmes que verificaste su origen.`
       : baseTextInput;
-    const { nvidiaModel, geminiPrimaryModel, geminiFallbackModel } = getProviderConfig();
-    const { nvidiaTimeoutMs, geminiTimeoutMs, evaluationTimeoutMs } = getTimeoutConfig();
+    const { ollamaModel, geminiPrimaryModel, geminiFallbackModel } = getProviderConfig();
+    const { ollamaTimeoutMs, geminiTimeoutMs, evaluationTimeoutMs } = getTimeoutConfig();
     const deadline = now() + evaluationTimeoutMs;
 
     const attempt = async ({ provider, model, attemptNumber, evaluate, timeoutLimitMs }) => {
@@ -233,31 +233,38 @@ export function createEvaluationService({
       }
     };
 
-    if (nvidiaModel) {
-      const nvidiaResult = await attempt({
-        provider: "nvidia",
-        model: nvidiaModel,
+    // Ollama Cloud se usa solo para texto hasta contar con una validación explícita
+    // de su contrato multimodal. Las imágenes continúan con Gemini sin degradarlas.
+    const useOllama = Boolean(ollamaModel && !image);
+
+    if (useOllama) {
+      const ollamaResult = await attempt({
+        provider: "ollama",
+        model: ollamaModel,
         attemptNumber: 1,
-        evaluate: evaluateNvidia,
-        timeoutLimitMs: nvidiaTimeoutMs,
+        evaluate: evaluateOllama,
+        timeoutLimitMs: ollamaTimeoutMs,
       });
-      if (!nvidiaResult.transient) {
-        return nvidiaResult.response;
+      if (!ollamaResult.transient) {
+        return ollamaResult.response;
       }
 
       logProvider(logger, "failover", {
-        fromProvider: "nvidia",
+        fromProvider: "ollama",
         toProvider: "gemini",
         model: geminiPrimaryModel,
       });
     } else {
-      logProvider(logger, "skipped", { provider: "nvidia", reason: "not_configured" });
+      logProvider(logger, "skipped", {
+        provider: "ollama",
+        reason: ollamaModel ? "image_not_supported" : "not_configured",
+      });
     }
 
     const geminiPrimaryResult = await attempt({
       provider: "gemini",
       model: geminiPrimaryModel,
-      attemptNumber: nvidiaModel ? 2 : 1,
+      attemptNumber: useOllama ? 2 : 1,
       evaluate: evaluateGemini,
       timeoutLimitMs: geminiTimeoutMs,
     });
@@ -273,7 +280,7 @@ export function createEvaluationService({
     const geminiFallbackResult = await attempt({
       provider: "gemini",
       model: geminiFallbackModel,
-      attemptNumber: nvidiaModel ? 3 : 2,
+      attemptNumber: useOllama ? 3 : 2,
       evaluate: evaluateGemini,
       timeoutLimitMs: geminiTimeoutMs,
     });

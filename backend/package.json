@@ -10,6 +10,7 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "test": "node --test",
+    "smoke:ollama:text": "node scripts/ollama-smoke.mjs",
     "smoke:nvidia:text": "node scripts/nvidia-smoke.mjs text",
     "smoke:nvidia:image": "node scripts/nvidia-smoke.mjs image"
   },
