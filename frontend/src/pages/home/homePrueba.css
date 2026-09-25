@@ -27,9 +27,48 @@
   font-size: 16px;
   line-height: 1.5;
   scrollbar-color: var(--hp-border-strong) var(--hp-canvas);
+  position: relative;
+  isolation: isolate;
+}
+
+.home-background {
+  position: fixed;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.home-background .dot-field-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.56;
+  pointer-events: none;
+}
+
+.home-prueba > :not(.home-background):not(.hp-skip-link),
+.home-prueba > main,
+.home-prueba > .hp-footer {
+  position: relative;
+  z-index: auto;
+}
+
+.home-prueba > .hp-header {
+  position: sticky;
+  z-index: 30;
+}
+
+/* DotField atraviesa las superficies, pero nunca compite con el contenido. */
+.home-prueba main :is(h1, h2, h3, p, a, button, span, svg),
+.home-prueba > .hp-footer > * {
+  position: relative;
+  z-index: 3;
 }
 
 .hp-header {
+  --hp-nav-height: 72px;
   --hp-canvas: #07111f;
   --hp-surface: #0b1829;
   --hp-surface-subtle: #0b1829;
@@ -102,6 +141,10 @@
   border-bottom: 1px solid color-mix(in srgb, var(--hp-border) 82%, transparent);
   background: color-mix(in srgb, var(--hp-canvas) 94%, transparent);
   backdrop-filter: blur(14px);
+}
+
+.home-prueba .hp-header {
+  background: var(--hp-canvas);
 }
 
 .hp-nav,
@@ -287,7 +330,7 @@
   height: calc(100dvh - var(--hp-nav-height));
   min-height: 640px;
   padding: 0;
-  background: var(--hp-ink);
+  background: transparent;
   border-bottom: 1px solid var(--hp-border);
 }
 
@@ -296,7 +339,7 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--hp-ink);
+  background: transparent;
 }
 
 .hp-image-carousel,
@@ -472,7 +515,7 @@
   padding-block: clamp(72px, 9vw, 112px);
   background:
     radial-gradient(circle at 88% 15%, rgb(34 211 238 / 8%), transparent 28rem),
-    var(--hp-canvas);
+    rgb(7 17 31 / 88%);
 }
 
 .hp-statement-panel {
@@ -513,8 +556,8 @@
   padding-block: clamp(96px, 12vw, 152px);
   border-block: 1px solid var(--hp-border);
   background:
-    linear-gradient(180deg, rgb(14 34 53 / 72%), rgb(7 17 31 / 96%)),
-    var(--hp-canvas);
+    linear-gradient(180deg, rgb(14 34 53 / 72%), rgb(7 17 31 / 88%)),
+    rgb(7 17 31 / 88%);
 }
 
 .hp-section-heading,
@@ -627,7 +670,7 @@
   padding-block: clamp(88px, 11vw, 144px);
   background:
     radial-gradient(circle at 12% 82%, rgb(37 99 235 / 10%), transparent 28rem),
-    #091524;
+    rgb(9 21 36 / 88%);
 }
 
 .hp-method-steps {
@@ -751,7 +794,7 @@
   justify-content: space-between;
   gap: 32px;
   padding-block: 40px 48px;
-  background: var(--hp-surface-subtle);
+  background: rgb(11 24 41 / 88%);
   border-top: 1px solid var(--hp-border);
 }
 
@@ -979,3 +1022,26 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* El fondo del footer debe extenderse hasta ambos bordes de la pantalla. */
+.home-prueba > .hp-footer {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: clamp(24px, 4vw, 64px);
+}
+
+@media (max-width: 520px) {
+  .home-prueba > .hp-footer {
+    padding-inline: 16px;
+  }
+}
+
+/* Ajuste global de jerarquía para mantener el home expresivo, pero más equilibrado. */
+.hp-hero-copy h1 { font-size: clamp(3rem, 6vw, 4.75rem); }
+.hp-statement-panel h2 { font-size: clamp(2rem, 4vw, 3.75rem); }
+.hp-section-heading h2,
+.hp-method h2 { font-size: clamp(2rem, 4vw, 3.5rem); }
+.hp-situation h3 { font-size: clamp(1.3rem, 2vw, 1.65rem); }
+.hp-method h3 { font-size: 1.35rem; }
+.hp-closing h2 { font-size: clamp(2.25rem, 4.5vw, 3.5rem); }

@@ -13,7 +13,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router";
 import Nav from "../../components/navegation/nav";
 import { useAuth } from "../../context/auth";
-import heroSecurityImage from "../../assets/fondo.webp";
+import heroSecurityImage from "../../assets/fondo.avif";
+import Background from "../../components/Background";
 import "./homePrueba.css";
 
 import SplitText from "@/components/react-bits/textAparicionAnimations/SplitText";
@@ -69,6 +70,7 @@ export default function HomePrueba() {
         Ir al contenido principal
       </a>
 
+      <Background />
       <Nav />
 
       <main id="contenido-home-prueba" tabIndex="-1">

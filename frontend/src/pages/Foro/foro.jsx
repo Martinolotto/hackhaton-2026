@@ -20,6 +20,7 @@ import {
 import { Link } from "react-router";
 import Nav from "../../components/navegation/nav";
 import SplitText from "../../components/react-bits/textAparicionAnimations/SplitText";
+import DotField from "../../components/DotField";
 import "../app-sections.css";
 
 const reports = [
@@ -34,6 +35,9 @@ export default function Foro() {
       <Nav />
       <main className="at-main" id="contenido-principal" tabIndex="-1">
         <header className="forum-community-header">
+          <div className="page-title-dot-field" aria-hidden="true">
+            <DotField dotRadius={1.15} dotSpacing={36} cursorRadius={220} cursorForce={0.05} bulgeStrength={30} gradientFrom="#22d3ee" gradientTo="#2563eb" glowColor="#0e2235" />
+          </div>
           <span className="forum-community-icon" aria-hidden="true"><MessagesSquare size={28} /></span>
           <div className="forum-community-copy">
             <SplitText tag="h1" text="Comunidad: experiencias que suman contexto." />
@@ -82,7 +86,7 @@ export default function Foro() {
             <header className="at-section-heading forum-feed-heading">
               <div className="forum-feed-title">
                 <span aria-hidden="true"><FileText size={18} /></span>
-                <SplitText tag="h2" id="reports-title" text="Reportes de ejemplo" />
+                <h2 id="reports-title">Reportes de ejemplo</h2>
               </div>
               <p>Maquetado sin datos en tiempo real.</p>
             </header>
@@ -91,7 +95,7 @@ export default function Foro() {
                 <article className={`report-card report-card-${tone}`} key={title}>
                   <span className="report-card-icon" aria-hidden="true"><Icon size={22} /></span>
                   <div className="report-card-copy">
-                    <SplitText tag="h3" text={title} />
+                    <h3>{title}</h3>
                     <p>{copy}</p>
                     <div className="report-details">
                       <span className="report-channel">{channel}</span>
