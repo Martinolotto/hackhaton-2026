@@ -1,5 +1,5 @@
+import { HttpError } from "./errorHandler.js";
+
 export function notFound(request, _response, next) {
-  const error = new Error(`Ruta no encontrada: ${request.method} ${request.originalUrl}`);
-  error.status = 404;
-  next(error);
+  next(new HttpError(404, "NOT_FOUND", `Ruta no encontrada: ${request.method} ${request.originalUrl}`));
 }
