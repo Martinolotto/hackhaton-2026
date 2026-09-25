@@ -12,14 +12,14 @@ export async function handleRegister({
     provider === "google"
       ? await supabase.auth.signInWithOAuth({
           provider: "google",
-          options: { redirectTo: `${window.location.origin}/dashboard` },
+          options: { redirectTo: `${window.location.origin}/evaluar` },
         })
       : await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { firstName, lastName },
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}/evaluar`,
           },
         });
 

@@ -5,7 +5,7 @@ export async function handleLogin({ provider, email, password, onSuccess }) {
     provider === "google"
       ? await supabase.auth.signInWithOAuth({
           provider: "google",
-          options: { redirectTo: `${window.location.origin}/dashboard` },
+          options: { redirectTo: `${window.location.origin}/evaluar` },
         })
       : await supabase.auth.signInWithPassword({ email, password });
 

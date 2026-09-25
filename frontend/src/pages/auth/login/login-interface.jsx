@@ -3,6 +3,8 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { handleLogin } from '@/components/services/handleLogin'
 import Nav from '../../../components/navegation/nav'
+import SplitText from '../../../components/react-bits/textAparicionAnimations/SplitText'
+import '../auth.css'
 
 const initialCredentials = {
   email: '',
@@ -43,13 +45,8 @@ function LoginInterface({ onAuthenticated }) {
     }
   }
 
-  const handleForgotPassword = () => {
-    console.log('Forgot password requested')
-    setMessage('Recuperación de contraseña lista para conectar.')
-  }
-
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="auth-page">
       <Nav />
       <main className="flex min-h-[calc(100vh-57px)] items-center justify-center p-4 sm:p-8">
       <section
@@ -60,9 +57,12 @@ function LoginInterface({ onAuthenticated }) {
           <div className="flex size-28 items-center justify-center border border-black" aria-hidden="true">
             <UserRound size={56} strokeWidth={1.5} />
           </div>
-          <h1 id="login-title" className="mt-6 text-3xl font-semibold">
-            Iniciar sesión
-          </h1>
+          <SplitText
+            tag="h1"
+            id="login-title"
+            text="Iniciar sesión"
+            className="mt-6 text-3xl font-semibold"
+          />
         </header>
 
         <form className="mt-8 grid gap-5 border border-black p-5" onSubmit={handleSubmit}>
@@ -100,10 +100,10 @@ function LoginInterface({ onAuthenticated }) {
             </span>
           </label>
 
-          <div className="flex flex-col gap-4 border border-black p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border border-black p-3">
             <label className="flex items-center gap-2 text-sm" htmlFor="remember-me">
               <input
-                className="size-5 border border-black accent-black"
+                className="size-5 border border-black"
                 id="remember-me"
                 name="rememberMe"
                 type="checkbox"
@@ -112,13 +112,6 @@ function LoginInterface({ onAuthenticated }) {
               />
               Recordarme
             </label>
-            <button
-              className="border border-black px-3 py-2 text-sm font-medium"
-              type="button"
-              onClick={handleForgotPassword}
-            >
-              Olvidé mi contraseña
-            </button>
           </div>
 
           <button
@@ -133,7 +126,7 @@ function LoginInterface({ onAuthenticated }) {
             className="min-h-12 border border-black px-4 font-semibold"
             to="/register"
           >
-            Crear una cuenta
+            CREAR UNA CUENTA
           </Link>
 
           {message && (

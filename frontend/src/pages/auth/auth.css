@@ -1,0 +1,263 @@
+.auth-page {
+  --hp-canvas: #07111f;
+  --hp-surface: #0b1829;
+  --hp-surface-subtle: #102033;
+  --hp-ink: #f8fafc;
+  --hp-muted: #cbd5e1;
+  --hp-border: #20364e;
+  --hp-border-strong: #7890aa;
+  --hp-primary: #2563eb;
+  --hp-primary-hover: #1d4ed8;
+  --hp-accent: #22d3ee;
+  --hp-accent-hover: #67e8f9;
+  --hp-focus: #67e8f9;
+  --hp-primary-soft: #102a56;
+  min-height: 100dvh;
+  color: var(--hp-ink);
+  background:
+    radial-gradient(circle at 82% 12%, rgb(37 99 235 / 18%), transparent 30rem),
+    radial-gradient(circle at 12% 76%, rgb(34 211 238 / 9%), transparent 28rem),
+    var(--hp-canvas);
+  font-family: "Geist Variable", Geist, ui-sans-serif, system-ui, sans-serif;
+}
+
+.auth-page ::selection { color: var(--hp-ink); background: #0e3a4a; }
+
+.auth-page main {
+  min-height: calc(100dvh - var(--hp-nav-height));
+  background: transparent;
+}
+
+.auth-page .hp-header {
+  --hp-canvas: #07111f;
+  --hp-surface: #0b1829;
+  --hp-surface-subtle: #102033;
+  --hp-ink: #f8fafc;
+  --hp-muted: #cbd5e1;
+  --hp-border: #20364e;
+  --hp-border-strong: #7890aa;
+  --hp-accent: #22d3ee;
+  border-bottom-color: rgb(148 163 184 / 18%);
+  background: rgb(7 17 31 / 92%);
+}
+
+.auth-page main > section {
+  border: 1px solid var(--hp-border);
+  border-radius: 16px;
+  color: var(--hp-ink);
+  background: linear-gradient(145deg, rgb(11 24 41 / 98%), rgb(7 17 31 / 98%));
+  box-shadow: 0 24px 70px rgb(2 6 23 / 28%);
+}
+
+.auth-page main > section[aria-label="Crear una cuenta"] { overflow: hidden; }
+
+.auth-page main > section[aria-label="Crear una cuenta"] > aside {
+  min-width: 0;
+  border-color: var(--hp-border);
+  background:
+    linear-gradient(145deg, rgb(14 34 53 / 96%), rgb(7 17 31 / 92%)),
+    radial-gradient(circle at 20% 20%, rgb(34 211 238 / 18%), transparent 22rem);
+}
+
+.auth-page main > section[aria-label="Crear una cuenta"] > section {
+  min-width: 0;
+}
+
+.auth-page main > section[aria-label="Crear una cuenta"] > aside header p {
+  margin: 0;
+  border: 1px solid rgb(103 232 249 / 30%);
+  border-radius: 8px;
+  color: var(--hp-accent-hover);
+  background: rgb(8 145 178 / 10%);
+  font-size: .85rem;
+  letter-spacing: .18em;
+}
+
+.auth-page main > section[aria-label="Crear una cuenta"] > aside header button {
+  min-height: 44px;
+  border: 1px solid var(--hp-border-strong);
+  border-radius: 8px;
+  color: var(--hp-muted);
+  background: transparent;
+}
+
+.auth-page main > section[aria-label="Crear una cuenta"] > aside > div:first-of-type {
+  position: relative;
+  overflow: hidden;
+  min-height: 260px;
+  border: 1px solid rgb(103 232 249 / 22%);
+  border-radius: 14px;
+  color: var(--hp-accent-hover);
+  background:
+    linear-gradient(135deg, rgb(8 145 178 / 14%), transparent 58%),
+    repeating-linear-gradient(135deg, transparent 0 28px, rgb(103 232 249 / 6%) 29px 30px),
+    #081827;
+}
+
+.auth-page main > section[aria-label="Crear una cuenta"] > aside > div:first-of-type::after {
+  position: absolute;
+  inset: 18% 25%;
+  border: 1px solid rgb(34 211 238 / 34%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 28px rgb(37 99 235 / 7%), 0 0 0 58px rgb(34 211 238 / 5%);
+  content: "";
+}
+
+.auth-page main > section > section,
+.auth-page h1,
+.auth-page h2 { color: var(--hp-ink); }
+
+.auth-page h1,
+.auth-page h2 { letter-spacing: -.04em; }
+
+.auth-page main > section > section > div:first-child p,
+.auth-page main > section > section > div:first-child p a { color: var(--hp-muted); }
+
+.auth-page main > section > section > div:first-child p a,
+.auth-page form a,
+.auth-page p a {
+  color: var(--hp-accent-hover);
+  text-decoration-color: currentcolor;
+  text-underline-offset: 4px;
+}
+
+.auth-page form { color: var(--hp-muted); }
+
+.auth-page form > label,
+.auth-page form > div > label { color: var(--hp-muted); }
+
+.auth-page input {
+  min-width: 0;
+  border-color: var(--hp-border);
+  border-radius: 8px;
+  color: var(--hp-ink);
+  background: #102033;
+  caret-color: var(--hp-accent);
+  transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease;
+}
+
+.auth-page input:hover:not(:disabled) {
+  border-color: var(--hp-border-strong);
+  background: #132943;
+}
+
+.auth-page form > label > span {
+  width: 100%;
+  min-width: 0;
+  border-color: var(--hp-border);
+  border-radius: 8px;
+  background: #102033;
+}
+
+.auth-page form > label > span input {
+  border: 0;
+  border-radius: 8px 0 0 8px;
+  background: transparent;
+}
+
+.auth-page form > label > span > svg { color: var(--hp-accent); }
+
+.auth-page form > label > span > button {
+  border-color: var(--hp-border);
+  color: var(--hp-accent-hover);
+  background: transparent;
+}
+
+.auth-page input[type="checkbox"] {
+  accent-color: var(--hp-primary) !important;
+}
+
+.auth-page input[type="checkbox"]:checked {
+  border-color: var(--hp-primary);
+  background-color: var(--hp-primary);
+}
+
+.auth-page form > div:has(input[type="checkbox"]),
+.auth-page form > label:has(input[type="checkbox"]) {
+  border-color: var(--hp-border);
+  border-radius: 8px;
+  color: var(--hp-muted);
+  background: rgb(16 32 51 / 72%);
+}
+
+.auth-page button,
+.auth-page form a[class*="border"] {
+  border-color: var(--hp-border);
+  border-radius: 8px;
+  color: var(--hp-muted);
+  background: var(--hp-surface-subtle);
+  transition: background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.auth-page button:hover:not(:disabled),
+.auth-page form a[class*="border"]:hover {
+  border-color: var(--hp-border-strong);
+  color: var(--hp-ink);
+  background: #132943;
+}
+
+.auth-page main button[type="submit"] {
+  border-color: var(--hp-primary);
+  color: #fff;
+  background: var(--hp-primary);
+  box-shadow: 0 6px 18px rgb(37 99 235 / 20%);
+}
+
+.auth-page main button[type="submit"]:hover:not(:disabled) {
+  border-color: var(--hp-primary-hover);
+  background: var(--hp-primary-hover);
+  box-shadow: 0 8px 24px rgb(37 99 235 / 28%);
+}
+
+.auth-page main > section[aria-labelledby="login-title"] form > a {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: .05em;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.auth-page button:disabled { cursor: not-allowed; opacity: .6; }
+
+.auth-page input:focus-visible,
+.auth-page button:focus-visible,
+.auth-page a:focus-visible {
+  outline: 2px solid var(--hp-focus);
+  outline-offset: 3px;
+}
+
+.auth-page [role="status"] {
+  border-color: rgb(34 211 238 / 30%);
+  border-radius: 8px;
+  color: var(--hp-accent-hover);
+  background: rgb(8 145 178 / 12%);
+}
+
+@media (max-width: 768px) {
+  .auth-page main {
+    align-items: flex-start;
+    padding: 24px 16px 40px;
+  }
+
+  .auth-page main > section[aria-label="Crear una cuenta"] > aside > div:first-of-type {
+    min-height: 180px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-page *,
+  .auth-page *::before,
+  .auth-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* Mantiene la jerarquía de acceso clara sin separar demasiado título y formulario. */
+.auth-page h1 { font-size: clamp(2rem, 4vw, 3rem); }
+.auth-page h2 { font-size: clamp(1.5rem, 3vw, 2.25rem); }

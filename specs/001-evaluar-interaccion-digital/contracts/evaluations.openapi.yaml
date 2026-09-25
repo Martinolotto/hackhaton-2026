@@ -1,0 +1,446 @@
+openapi: 3.1.0
+info:
+  title: Contrato de evaluación de interacciones digitales
+  version: 1.1.0
+  description: >-
+    Contrato compartido y stateless para evaluación inicial y una reevaluación.
+    El proveedor de evaluación es un detalle privado del backend.
+servers:
+  - url: "{apiBaseUrl}"
+    variables:
+      apiBaseUrl:
+        default: http://localhost:3000
+paths:
+  /api/evaluations:
+    post:
+      operationId: evaluateDigitalInteraction
+      summary: Evaluar o reevaluar una interacción digital
+      description: >-
+        Requiere un access token de Supabase. verificationResult nulo produce una
+        evaluación inicial; un objeto produce la única reevaluación prevista por
+        la experiencia. La operación no crea ni persiste un caso.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EvaluationRequest"
+            examples:
+              initial:
+                summary: Evaluación inicial
+                value:
+                  interaction:
+                    description: Recibí un mensaje con una alerta urgente sobre mi cuenta.
+                    url: https://example.invalid/verificar
+                    channel: Mensaje de texto
+                    presentedIdentity: Entidad financiera conocida
+                    observableOrigin: Número desconocido
+                    priorRelationship: Soy cliente, pero nunca me contactaron por este número.
+                    requestedAction: Abrir el enlace e ingresar datos.
+                    doubtReason: El mensaje usa urgencia y un enlace externo.
+                  verificationResult: null
+              reevaluated:
+                summary: Reevaluación
+                value:
+                  interaction:
+                    description: Recibí un mensaje con una alerta urgente sobre mi cuenta.
+                    url: https://example.invalid/verificar
+                    channel: Mensaje de texto
+                    presentedIdentity: Entidad financiera conocida
+                    observableOrigin: Número desconocido
+                    priorRelationship: Soy cliente, pero nunca me contactaron por este número.
+                    requestedAction: Abrir el enlace e ingresar datos.
+                    doubtReason: El mensaje usa urgencia y un enlace externo.
+                  verificationResult:
+                    verificationPerformed: Consulté la aplicación oficial sin usar el enlace.
+                    observedResult: No apareció ninguna alerta en la cuenta.
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MultimodalEvaluationRequest"
+            encoding:
+              image:
+                contentType: image/png, image/jpeg, image/webp
+      responses:
+        "200":
+          description: Evaluación completa y validada.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationResponse"
+        "400":
+          description: JSON o datos de entrada inválidos.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: INVALID_REQUEST
+                  message: La solicitud de evaluación no es válida.
+        "401":
+          description: Bearer token ausente, inválido, expirado o no verificable.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: UNAUTHORIZED
+                  message: Es necesario iniciar sesión nuevamente.
+        "413":
+          description: Body superior al límite admitido.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: PAYLOAD_TOO_LARGE
+                  message: La solicitud supera el tamaño permitido.
+        "429":
+          description: Cuota temporal del usuario agotada.
+          headers:
+            Retry-After:
+              description: Segundos aproximados hasta poder reintentar.
+              schema:
+                type: integer
+                minimum: 1
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: RATE_LIMITED
+                  message: Demasiadas solicitudes de evaluación. Intenta nuevamente más tarde.
+        "503":
+          description: Gemini indisponible, en cuota, con timeout o salida inválida.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: EVALUATION_UNAVAILABLE
+                  message: No pudimos generar una evaluación confiable en este momento.
+        "500":
+          description: Error interno inesperado y sanitizado.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error:
+                  code: INTERNAL_ERROR
+                  message: Ocurrió un error interno.
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Access token de la sesión Supabase.
+  schemas:
+    MultimodalEvaluationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - evaluation
+      properties:
+        evaluation:
+          type: string
+          contentMediaType: application/json
+          description: Serialización JSON completa de EvaluationRequest.
+        image:
+          type: string
+          format: binary
+          description: Captura opcional PNG, JPEG o WEBP de hasta 4 MB; no se persiste.
+    EvaluationRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - interaction
+        - verificationResult
+      properties:
+        interaction:
+          $ref: "#/components/schemas/Interaction"
+        verificationResult:
+          oneOf:
+            - $ref: "#/components/schemas/VerificationResult"
+            - type: "null"
+    Interaction:
+      type: object
+      additionalProperties: false
+      required:
+        - description
+        - url
+        - channel
+        - presentedIdentity
+        - observableOrigin
+        - priorRelationship
+        - requestedAction
+        - doubtReason
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 10000
+        url:
+          type:
+            - string
+            - "null"
+          maxLength: 2048
+          description: Texto aportado; el backend no recupera su contenido.
+        channel:
+          type: string
+          minLength: 1
+          maxLength: 100
+        presentedIdentity:
+          type: string
+          minLength: 1
+          maxLength: 200
+        observableOrigin:
+          type:
+            - string
+            - "null"
+          maxLength: 500
+        priorRelationship:
+          type: string
+          minLength: 1
+          maxLength: 500
+        requestedAction:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        doubtReason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    VerificationResult:
+      type: object
+      additionalProperties: false
+      required:
+        - verificationPerformed
+        - observedResult
+      properties:
+        verificationPerformed:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        observedResult:
+          type: string
+          minLength: 1
+          maxLength: 2000
+    EvaluationResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - phase
+        - summary
+        - indicators
+        - apparentLegitimacy
+        - evidence
+        - contradictions
+        - missingInformation
+        - risk
+        - uncertainty
+        - verificationSteps
+        - cautionGuidance
+        - learning
+        - limitations
+      properties:
+        phase:
+          type: string
+          enum:
+            - initial
+            - reevaluated
+        summary:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        indicators:
+          type: array
+          maxItems: 12
+          items:
+            $ref: "#/components/schemas/StatementWithBasis"
+        apparentLegitimacy:
+          type: array
+          maxItems: 12
+          items:
+            $ref: "#/components/schemas/StatementWithBasis"
+        evidence:
+          type: array
+          maxItems: 12
+          items:
+            $ref: "#/components/schemas/Evidence"
+        contradictions:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        missingInformation:
+          type: array
+          maxItems: 12
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        risk:
+          $ref: "#/components/schemas/Risk"
+        uncertainty:
+          $ref: "#/components/schemas/Uncertainty"
+        verificationSteps:
+          type: array
+          minItems: 1
+          maxItems: 5
+          items:
+            $ref: "#/components/schemas/VerificationStep"
+        cautionGuidance:
+          type: array
+          minItems: 1
+          maxItems: 8
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+        learning:
+          type: string
+          minLength: 1
+          maxLength: 1500
+        limitations:
+          type: array
+          minItems: 1
+          maxItems: 8
+          items:
+            type: string
+            minLength: 1
+            maxLength: 1000
+    StatementWithBasis:
+      type: object
+      additionalProperties: false
+      required:
+        - statement
+        - basis
+      properties:
+        statement:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        basis:
+          type: string
+          enum:
+            - user_provided
+            - inferred
+    Evidence:
+      type: object
+      additionalProperties: false
+      required:
+        - statement
+        - origin
+        - effect
+        - verificationStatus
+      properties:
+        statement:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        origin:
+          type: string
+          enum:
+            - user_input
+            - reported_verification_result
+        effect:
+          type: string
+          enum:
+            - supports_legitimacy
+            - raises_concern
+            - neutral
+        verificationStatus:
+          type: string
+          enum:
+            - not_independently_verified
+            - user_reported
+    Risk:
+      type: object
+      additionalProperties: false
+      required:
+        - level
+        - explanation
+      properties:
+        level:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+            - undetermined
+        explanation:
+          type: string
+          minLength: 1
+          maxLength: 2000
+    Uncertainty:
+      type: object
+      additionalProperties: false
+      required:
+        - level
+        - explanation
+      properties:
+        level:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+        explanation:
+          type: string
+          minLength: 1
+          maxLength: 2000
+    VerificationStep:
+      type: object
+      additionalProperties: false
+      required:
+        - priority
+        - action
+        - reason
+      properties:
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 5
+        action:
+          type: string
+          minLength: 1
+          maxLength: 1000
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 1000
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          additionalProperties: false
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              enum:
+                - INVALID_REQUEST
+                - UNAUTHORIZED
+                - PAYLOAD_TOO_LARGE
+                - RATE_LIMITED
+                - EVALUATION_UNAVAILABLE
+                - INTERNAL_ERROR
+            message:
+              type: string
+              minLength: 1

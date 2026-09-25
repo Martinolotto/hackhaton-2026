@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { handleRegister } from '@/components/services/registerHandler'
 import Nav from '../../components/navegation/nav'
+import SplitText from '../../components/react-bits/textAparicionAnimations/SplitText'
+import './auth.css'
 
 const initialForm = {
   firstName: '',
@@ -74,14 +76,14 @@ function AuthInterface({ onRegistered }) {
   }
 
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="auth-page">
       <Nav />
       <main className="min-h-[calc(100vh-57px)] p-4 sm:p-8 lg:flex lg:items-center lg:justify-center lg:p-12">
       <section
         aria-label="Crear una cuenta"
-        className="mx-auto grid w-full max-w-6xl border border-black bg-white md:grid-cols-2"
+        className="mx-auto grid w-full max-w-5xl min-w-0 border border-black bg-white md:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)]"
       >
-        <aside className="flex min-h-112 flex-col border-b border-black p-5 md:min-h-150 md:border-r md:border-b-0 md:p-8">
+        <aside className="auth-story flex min-h-112 min-w-0 flex-col border-b border-black p-5 md:min-h-150 md:border-r md:border-b-0 md:p-8">
           <header className="flex items-center justify-between gap-4">
             <p className="border border-black px-3 py-2 text-lg font-bold tracking-widest">
               AMU
@@ -99,23 +101,15 @@ function AuthInterface({ onRegistered }) {
             <p className="max-w-56 text-sm">Espacio reservado para la imagen principal</p>
           </div>
 
-          <div className="mt-8 text-center">
-            <h1 className="text-2xl font-semibold sm:text-3xl">
-              Capturando momentos,
-              <br />
-              creando recuerdos
-            </h1>
-            <div className="mt-6 flex justify-center gap-2" aria-label="Indicador de diapositivas">
-              <span className="h-1 w-7 border border-black" />
-              <span className="h-1 w-7 border border-black" />
-              <span className="h-1 w-7 border-2 border-black" />
-            </div>
-          </div>
         </aside>
 
         <section className="flex min-h-150 flex-col p-5 sm:p-8 md:p-12">
           <div>
-            <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl">Crear una cuenta</h2>
+            <SplitText
+              tag="h2"
+              text="Crear una cuenta"
+              className="text-3xl font-semibold tracking-tight sm:text-4xl"
+            />
             <p className="mt-3 text-sm">
               ¿Ya tienes una cuenta?{' '}
               <Link
